@@ -1,0 +1,46 @@
+# Fichiers et répertoires générés par Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environnements virtuels
+venv/
+env/
+.venv/
+ENV/
+.env
+
+# Fichiers de configuration sensible
+.env
+.secrets
+config.py
+
+# Fichiers de cache et logs
+.pytest_cache/
+*.log
+logs/
+
+# Fichiers de build et distribution
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Fichiers de développement
+.ipynb_checkpoints/
+*.ipynb
+
+# Fichiers de base de données
+*.db
+*.sqlite3
+
+# Fichiers de Streamlit
+.streamlit/
+
+# Fichiers de IDE
+.vscode/
+.idea/
+
+
+# supabase
+supabase/
