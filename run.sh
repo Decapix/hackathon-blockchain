@@ -21,21 +21,29 @@ setup_env_file() {
 }
 
 # Function to pull the latest Docker images and start the services
-start_docker_services() {
-    echo "Pulling the latest Docker images..."
-    docker compose pull
-
-    echo "Starting the services in detached mode..."
-    docker compose up -d
-}
-
-# Function to start the services in production mode
-start_services_prod() {
+start_docker_supabase_services() {
     clone_supabase_repo
     cd supabase/docker
     setup_env_file
-    start_docker_services
+    echo "Checking if services are already running..."
+
+    # Vérifier si des conteneurs sont en cours d'exécution
+    if docker compose ps | grep "Up"; then
+        echo "Services are already running. No action taken."
+    else
+        echo "Pulling the latest Docker images..."
+        docker compose pull
+
+        echo "Starting the services in detached mode..."
+        docker compose up -d
+    fi
     cd ../..
+}
+
+
+# Function to start the services in production mode
+start_services_prod() {
+    start_docker_supabase_services
 
     echo "Starting the docker-compose-project.yaml..."
     docker compose -f docker-compose-project.yaml up -d
@@ -43,11 +51,7 @@ start_services_prod() {
 
 # Function to start the services in development mode
 start_services_dev() {
-    clone_supabase_repo
-    cd supabase/docker
-    setup_env_file
-    start_docker_services
-    cd ../..
+    start_docker_supabase_services
 
     echo "Starting the docker-compose-project.yaml in attached mode..."
     docker compose -f docker-compose-project.yaml up
@@ -55,6 +59,7 @@ start_services_dev() {
 
 # Function to restart the docker-compose-project
 restart_project() {
+    start_docker_supabase_services
     echo "Restarting the docker-compose-project.yaml..."
     docker compose -f docker-compose-project.yaml down
     docker compose -f docker-compose-project.yaml build
