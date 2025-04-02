@@ -44,3 +44,8 @@ dist/
 
 # supabase
 supabase/
+
+
+# node js
+web3solana/node_modules/
+web3solana/package-lock.json

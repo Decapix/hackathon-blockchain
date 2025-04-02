@@ -10,13 +10,23 @@ services:
     networks:
       - app-network
 
-
   frontend:
     build: ./frontend
     volumes:
       - ./frontend:/app
     ports:
       - "8501:8501"
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+  web3solana:
+    build: ./web3solana
+    volumes:
+      - ./web3solana:/app
+    ports:
+      - "8503:3000"  # Expose l'API web
     networks:
       - app-network
     env_file:
