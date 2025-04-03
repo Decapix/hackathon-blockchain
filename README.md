@@ -116,6 +116,6 @@ Exemple de sortie :
 | Frontend App    | http://localhost:8501              |
 | Web3Solana      | http://localhost:8503              |
 | RabbitMQ        | http://localhost:15672 (user/password) |
-| Redis           | http://localhost:6379                     |
+| Redis           | localhost:6379                     |
 | Supabase Studio | http://localhost:54323             |
 | Supabase API    | http://localhost:8000              |
