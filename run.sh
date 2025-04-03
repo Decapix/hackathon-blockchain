@@ -25,28 +25,33 @@ start_docker_supabase_services() {
     clone_supabase_repo
     cd supabase/docker
     setup_env_file
-    echo "Checking if services are already running..."
+    echo "Checking if Supabase services are already running..."
 
-    # Vérifier si des conteneurs sont en cours d'exécution
     if docker compose ps | grep "Up"; then
-        echo "Services are already running. No action taken."
+        echo "Supabase services are already running. No action taken."
     else
-        echo "Pulling the latest Docker images..."
+        echo "Pulling the latest Supabase Docker images..."
         docker compose pull
 
-        echo "Starting the services in detached mode..."
+        echo "Starting Supabase services in detached mode..."
         docker compose up -d
     fi
     cd ../..
 }
 
+# Function to build and start project services
+start_project_services() {
+    echo "Building project services..."
+    docker compose -f docker-compose-project.yaml build --no-cache
+
+    echo "Starting project services in detached mode..."
+    docker compose -f docker-compose-project.yaml up -d
+}
 
 # Function to start the services in production mode
 start_services_prod() {
     start_docker_supabase_services
-
-    echo "Starting the docker-compose-project.yaml..."
-    docker compose -f docker-compose-project.yaml up -d
+    start_project_services
 }
 
 # Function to start the services in development mode
