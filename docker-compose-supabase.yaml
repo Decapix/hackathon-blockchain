@@ -11,6 +11,9 @@ services:
 
   studio:
     container_name: supabase-studio
+    networks:
+      - shared_network
+      - default
     image: supabase/studio:20250317-6955350
     restart: unless-stopped
     healthcheck:
@@ -53,6 +56,7 @@ services:
     container_name: supabase-kong
     networks:
       - shared_network
+      - default
     image: kong:2.8.1
     restart: unless-stopped
     ports:
@@ -81,6 +85,9 @@ services:
 
   auth:
     container_name: supabase-auth
+    networks:
+      - shared_network
+      - default
     image: supabase/gotrue:v2.170.0
     restart: unless-stopped
     healthcheck:
@@ -164,6 +171,9 @@ services:
 
   rest:
     container_name: supabase-rest
+    networks:
+      - shared_network
+      - default
     image: postgrest/postgrest:v12.2.8
     restart: unless-stopped
     depends_on:
@@ -188,6 +198,9 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
+    networks:
+      - shared_network
+      - default
     image: supabase/realtime:v2.34.43
     restart: unless-stopped
     depends_on:
@@ -233,6 +246,9 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
+    networks:
+      - shared_network
+      - default
     image: supabase/storage-api:v1.19.3
     restart: unless-stopped
     volumes:
@@ -276,6 +292,9 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
+    networks:
+      - shared_network
+      - default
     image: darthsim/imgproxy:v3.8.0
     restart: unless-stopped
     volumes:
@@ -298,6 +317,9 @@ services:
 
   meta:
     container_name: supabase-meta
+    networks:
+      - shared_network
+      - default
     image: supabase/postgres-meta:v0.87.1
     restart: unless-stopped
     depends_on:
@@ -316,6 +338,9 @@ services:
 
   functions:
     container_name: supabase-edge-functions
+    networks:
+      - shared_network
+      - default
     image: supabase/edge-runtime:v1.67.4
     restart: unless-stopped
     volumes:
@@ -340,6 +365,9 @@ services:
 
   analytics:
     container_name: supabase-analytics
+    networks:
+      - shared_network
+      - default
     image: supabase/logflare:1.12.0
     restart: unless-stopped
     ports:
@@ -388,6 +416,9 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
+    networks:
+      - shared_network
+      - default
     image: supabase/postgres:15.8.1.060
     restart: unless-stopped
     volumes:
@@ -445,6 +476,9 @@ services:
 
   vector:
     container_name: supabase-vector
+    networks:
+      - shared_network
+      - default
     image: timberio/vector:0.28.1-alpine
     restart: unless-stopped
     volumes:
@@ -476,6 +510,9 @@ services:
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
     container_name: supabase-pooler
+    networks:
+      - shared_network
+      - default
     image: supabase/supavisor:2.4.14
     restart: unless-stopped
     ports:
