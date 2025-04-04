@@ -18,6 +18,13 @@ setup_env_file() {
     else
         echo ".env file already exists."
     fi
+
+    if [ ! -f ".docker-compose.yml" ]; then
+        echo "Copying the docker compose file..."
+        cp ../../docker-compose-supabase.yaml docker-compose.yml
+    else
+        echo "docker compose file already exists."
+    fi
 }
 
 # Function to pull the latest Docker images and start the services
@@ -32,6 +39,8 @@ start_docker_supabase_services() {
     else
         echo "Pulling the latest Supabase Docker images..."
         docker compose pull
+
+        docker compose build --no-cache
 
         echo "Starting Supabase services in detached mode..."
         docker compose up -d
