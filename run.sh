@@ -1,5 +1,4 @@
 #!/bin/bash
-source ./db_tables.sh
 
 # Function to clone the Supabase repository if it doesn't exist
 clone_supabase_repo() {
@@ -20,6 +19,25 @@ boot_network() {
     else
         echo "shared_network network already exists."
     fi
+}
+
+get_data_supabase() {
+    local target_dir="supabase/docker/volumes/db/data"
+
+    if [ -d "$target_dir" ]; then
+        echo "Le dossier '$target_dir' existe déjà."
+        echo "👉 Si tu veux le remplacer, supprime-le d'abord avec :"
+        echo "   rm -rf \"$target_dir\""
+        return 1
+    fi
+
+    echo "✅ Création du dossier '$target_dir'..."
+    mkdir -p "$target_dir"
+
+    echo "📦 Copie des fichiers de 'supabase_data/' vers '$target_dir'..."
+    cp -a supabase_data/. "$target_dir/"
+
+    echo "✅ Copie terminée !"
 }
 
 
@@ -73,15 +91,17 @@ start_project_services() {
 # Function to start the services in production mode
 start_services_prod() {
     boot_network
+    get_data_supabase
     start_docker_supabase_services
     start_project_services
+
 }
 
 # Function to start the services in development mode
 start_services_dev() {
     boot_network
+    get_data_supabase
     start_docker_supabase_services
-
     echo "Starting the docker-compose-project.yaml in attached mode..."
     docker compose -f docker-compose-project.yaml up
 }
@@ -89,6 +109,7 @@ start_services_dev() {
 # Function to restart the docker-compose-project
 restart_project() {
     boot_network
+    get_data_supabase
     start_docker_supabase_services
     echo "Restarting the docker-compose-project.yaml..."
     docker compose -f docker-compose-project.yaml down
@@ -114,6 +135,9 @@ stop_project() {
 
 # Check the command
 case $1 in
+    get_table_supasbase)
+        get_data_supabase
+        ;;
     up-prod)
         start_services_prod
         ;;

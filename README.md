@@ -84,6 +84,11 @@ cp .env-supabase .env
 ./run.sh down-project
 ```
 
+**Recuperer les data de git pour Supabase :**
+```bash
+./run.sh get_table_supasbase
+```
+
 ---
 
 ### Vérifier l’état de la stack
