@@ -10,6 +10,17 @@ clone_supabase_repo() {
     fi
 }
 
+
+# function to start network
+boot_network() {
+    if [ ! "$(docker network ls | grep shared_network)" ]; then
+        echo "Creating the shared_network network..."
+        docker network create shared_network
+    else
+        echo "shared_network network already exists."
+    fi
+}
+
 # Function to set up the .env file if it doesn't exist
 setup_env_file() {
     if [ ! -f ".env" ]; then
@@ -59,12 +70,14 @@ start_project_services() {
 
 # Function to start the services in production mode
 start_services_prod() {
+    boot_network
     start_docker_supabase_services
     start_project_services
 }
 
 # Function to start the services in development mode
 start_services_dev() {
+    boot_network
     start_docker_supabase_services
 
     echo "Starting the docker-compose-project.yaml in attached mode..."
@@ -73,6 +86,7 @@ start_services_dev() {
 
 # Function to restart the docker-compose-project
 restart_project() {
+    boot_network
     start_docker_supabase_services
     echo "Restarting the docker-compose-project.yaml..."
     docker compose -f docker-compose-project.yaml down
