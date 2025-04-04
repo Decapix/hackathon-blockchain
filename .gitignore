@@ -30,6 +30,7 @@ dist/
 .ipynb_checkpoints/
 *.ipynb
 
+
 # Fichiers de base de données
 *.db
 *.sqlite3
@@ -49,3 +50,8 @@ supabase/
 # node js
 web3solana/node_modules/
 web3solana/package-lock.json
+
+
+
+
+migrations_init/

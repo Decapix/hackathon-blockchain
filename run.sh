@@ -1,4 +1,5 @@
 #!/bin/bash
+source ./db_tables.sh
 
 # Function to clone the Supabase repository if it doesn't exist
 clone_supabase_repo() {
@@ -20,6 +21,7 @@ boot_network() {
         echo "shared_network network already exists."
     fi
 }
+
 
 # Function to set up the .env file if it doesn't exist
 setup_env_file() {
@@ -131,3 +133,15 @@ case $1 in
         echo "Usage: $0 {up-prod|up-dev|restart-project|down-all|down-project}"
         ;;
 esac
+
+
+
+
+# export schema
+# ./import_schema.sh
+# ./export_schema.sh
+#
+# Export complet
+# docker exec supabase-db pg_dump -U postgres --schema-only > full_schema.sql
+# Import complet
+# docker exec -i supabase-db psql -U postgres < full_schema.sql

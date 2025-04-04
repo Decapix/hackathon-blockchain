@@ -1,5 +1,11 @@
 services:
 
+  # migrator:
+  #   build: ./migrations_init
+  #   env_file:
+  #     - .env
+  #     - .env-supabase
+
   backend:
     build: ./backend
     volumes:

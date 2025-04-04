@@ -1,0 +1,66 @@
+{
+  "tables": {
+    "profiles": {
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "nullable": false,
+          "default": null
+        },
+        "username": {
+          "type": "text",
+          "nullable": false,
+          "default": null
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "nullable": true,
+          "default": "now()"
+        }
+      }
+    },
+    "posts": {
+      "columns": {
+        "id": {
+          "type": "int4",
+          "nullable": false,
+          "default": "nextval('posts_id_seq'::regclass)"
+        },
+        "user_id": {
+          "type": "uuid",
+          "nullable": true,
+          "default": null
+        },
+        "content": {
+          "type": "text",
+          "nullable": true,
+          "default": null
+        }
+      }
+    },
+    "ok test": {
+      "columns": {
+        "id": {
+          "type": "int8",
+          "nullable": false,
+          "default": null
+        },
+        "created_at": {
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        "freee": {
+          "type": "jsonb",
+          "nullable": true,
+          "default": null
+        },
+        "werq": {
+          "type": "text",
+          "nullable": true,
+          "default": null
+        }
+      }
+    }
+  }
+}
