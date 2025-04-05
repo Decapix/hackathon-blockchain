@@ -24,14 +24,14 @@ function HomePage() {
       <div className="flex flex-1 overflow-hidden">
         {isConnected ? (
           <div className="w-full h-full flex flex-col bg-gray-50 items-center justify-center">
-            <h1 className="text-3xl font-bold text-center">Vous êtes connecté !</h1>
-            <p className="mt-4">Bienvenue sur notre plateforme sécurisée.</p>
+            <h1 className="text-3xl font-bold text-center">You are connected !</h1>
+            <p className="mt-4">Welcome on our secured platform.</p>
             <div className="mt-8">
               <button
-                onClick={() => navigate('/admin')}
+                onClick={() => navigate('/menu')}
                 className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
-                Accéder au tableau de bord
+                Go to my dashboard
               </button>
             </div>
           </div>
@@ -39,10 +39,10 @@ function HomePage() {
           <div className="w-full h-full flex flex-col bg-gray-50 items-center justify-center">
             <div className="max-w-3xl px-6 py-16 text-center">
               <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
-                Bienvenue sur notre plateforme sécurisée
+              Welcome on our secured platform
               </h1>
               <p className="mt-6 text-xl text-gray-500">
-                Connectez-vous avec Web3Auth pour accéder à votre tableau de bord.
+                Connect with Web3Auth to access your dashboard.
               </p>
               <div className="mt-10 flex justify-center">
                 <button
@@ -50,7 +50,7 @@ function HomePage() {
                   className="flex items-center px-6 py-3 text-white rounded-full bg-blue-600 hover:bg-blue-700 transition-colors duration-300"
                 >
                   <img src={web3AuthLogoWhite} alt="Web3Auth Logo" className="w-6 h-6 mr-3" />
-                  Se connecter avec Web3Auth
+                    Connect with Web3Auth
                 </button>
               </div>
             </div>

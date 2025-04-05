@@ -8,7 +8,7 @@ import requests
 
 API_URL = "http://backend:8000/get_last_exam"
 
-st.title("Dernier examen enregistré")
+st.write("Dernier examen enregistré")
 
 try:
     response = requests.get(API_URL)
