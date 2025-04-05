@@ -5,3 +5,5 @@ supabase
 python-jose
 python-dotenv
 python-multipart
+web3
+py-solc-x==2.0.3
