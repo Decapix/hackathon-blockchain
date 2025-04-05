@@ -32,12 +32,12 @@ services:
       - .env
       - .env-supabase
 
-  # web3:
-  #   build: ./web3
+  # js-cont:
+  #   build: ./js-cont
   #   volumes:
-  #     - ./web3:/app
+  #     - ./js-cont:/app
   #   ports:
-  #     - "8503:8545"
+  #     - "8503:3000"
   #   networks:
   #     - shared_network
   #     - default

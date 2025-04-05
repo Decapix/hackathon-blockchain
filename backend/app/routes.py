@@ -97,3 +97,12 @@ async def get_users():
     return users
 
 # curl -X GET "http://localhost:8502/get_users/"                                                                                      7 ↵
+
+
+@router.get("/get_user/{username}")
+async def get_user(username: str):
+    # Récupérez les données de l'utilisateur spécifié
+    user_data = db.search(User.username == username)
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user_data
