@@ -3,6 +3,28 @@ import cv2
 import time
 from GazeTracking.gaze_tracking import GazeTracking
 from questions import QUESTIONS
+import logging
+import requests
+
+API_URL = "http://backend:8000/get_last_exam"
+
+st.title("Dernier examen enregistré")
+
+try:
+    response = requests.get(API_URL)
+    response.raise_for_status()
+    data = response.json()
+
+    if data:
+        st.subheader("Détails de l'examen")
+        for key, value in data.items():
+            st.write(f"**{key}**: {value}")
+    else:
+        st.info("Aucun examen trouvé.")
+
+except requests.exceptions.RequestException as e:
+    st.error(f"Erreur lors de la requête : {e}")
+
 
 # --- Style personnalisé ---
 st.markdown(
