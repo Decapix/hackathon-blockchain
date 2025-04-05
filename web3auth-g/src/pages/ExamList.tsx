@@ -24,8 +24,8 @@ const ExamList: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedExam) {
-      console.log(`Selected exam: ${selectedExam}`);
-      // navigate(`/exam/${selectedExam}`);
+      console.log(`Starting exam: ${selectedExam}`);
+      window.open('http://localhost:8501/test', '_blank');
     }
   };
 
@@ -36,6 +36,10 @@ const ExamList: React.FC = () => {
   return (
     <div 
       style={{
+        backgroundImage: "url('/img.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
         backgroundColor: "#121212",
         minHeight: "100vh",
         display: "flex",
