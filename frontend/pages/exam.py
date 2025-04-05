@@ -1,31 +1,25 @@
 import streamlit as st
-import cv2
+from questions import QUESTIONS
 
-st.title("Webcam Live Feed sans PIL")
+# Configuration de la page
+st.set_page_config(page_title="Sélection d'examen", layout="wide")
 
-# Fonction pour capturer et afficher les images de la webcam
-def capture_webcam():
-    cap = cv2.VideoCapture(0)
+def main():
+    st.title("Sélection d'examen")
+    
+    # Sélection de l'examen
+    exam = st.selectbox("Sélectionnez un examen", list(QUESTIONS.keys()))
+    
+    # Affichage d'informations sur l'examen sélectionné
+    st.write(f"Cet examen contient {len(QUESTIONS[exam])} questions.")
+    
+    # Bouton de validation
+    if st.button("Commencer l'examen"):
+        # Stockage de l'examen sélectionné dans la session state
+        st.session_state.selected_exam = exam
+        # Redirection vers la page de test
+        st.query_params.update({"exam": exam})
+        st.switch_page("pages/test.py")
 
-    if not cap.isOpened():
-        st.error("Erreur : Impossible d'ouvrir la webcam.")
-        return
-
-    stframe = st.image([])
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            st.error("Erreur : Impossible de lire le flux de la webcam.")
-            break
-
-        # Convertir l'image de BGR (OpenCV) à RGB (Streamlit)
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        # Afficher l'image dans Streamlit
-        stframe.image(frame_rgb)
-
-    cap.release()
-
-# Lancer la capture de la webcam
-capture_webcam()
+if __name__ == "__main__":
+    main()

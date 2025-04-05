@@ -1,5 +1,4 @@
 import streamlit as st
-from gaze_tracker import start_exam_monitoring
 
 # Configuration de la page
 st.set_page_config(page_title="Dashboard", page_icon="🔗", layout="centered")
@@ -69,6 +68,4 @@ with col1:
 with col2:
     if st.button("📈 Pass an Exam"):
         st.write("Starting eye tracking exam...")
-        cheat_percentage = start_exam_monitoring()
-        # st.write(f"Exam completed! Cheating percentage: {cheat_percentage:.2f}%")
         st.switch_page("pages/exam.py")
