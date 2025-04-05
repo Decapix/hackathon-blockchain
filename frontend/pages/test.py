@@ -1,8 +1,17 @@
 import streamlit as st
 import cv2
 import time
+import requests
 from GazeTracking.gaze_tracking import GazeTracking
 from questions import QUESTIONS
+
+try:
+    last_exam_response = requests.get("http://localhost:8502/get_last_exam")
+    last_exam_data = last_exam_response.json() if last_exam_response.status_code == 200 else None
+except Exception as e:
+    pass
+
+st.write(str(last_exam_response.json()))
 
 # --- Style personnalisé ---
 st.markdown(
