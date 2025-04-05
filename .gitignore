@@ -55,13 +55,6 @@ web3solana/package-lock.json
 
 
 migrations_init/
-<<<<<<< HEAD
-<<<<<<< HEAD
-node_modules/
-package-lock.json
-=======
-=======
->>>>>>> web3incode
 
 
 # Dependencies
@@ -94,7 +87,3 @@ yarn-error.log*
 
 # System Files
 Thumbs.db
-<<<<<<< HEAD
->>>>>>> web3incode
-=======
->>>>>>> web3incode
