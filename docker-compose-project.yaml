@@ -34,18 +34,19 @@ services:
     devices:
       - /dev/video0:/dev/video0
 
-  # web3:
-  #   build: ./web3
-  #   volumes:
-  #     - ./web3:/app
-  #   ports:
-  #     - "8503:8545"
-  #   networks:
-  #     - shared_network
-  #     - default
-  #   env_file:
-  #     - .env
-  #     - .env-supabase
+  web3:
+    build: ./web3auth-g
+    volumes:
+      - ./web3auth-g:/app
+    ports:
+      - "8503:5173"
+    networks:
+      - shared_network
+      - default
+    environment:
+      - VITE_DEV_SERVER_HOST=0.0.0.0
+      - VITE_DEV_SERVER_PORT=5173
+
 
 
   # rabbitmq:

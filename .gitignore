@@ -55,5 +55,40 @@ web3solana/package-lock.json
 
 
 migrations_init/
+<<<<<<< HEAD
 node_modules/
 package-lock.json
+=======
+
+
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+/dist
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDE
+.vscode
+.idea
+
+# System Files
+Thumbs.db
+>>>>>>> web3incode
