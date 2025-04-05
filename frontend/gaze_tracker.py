@@ -1,107 +1,75 @@
 import streamlit as st
 import cv2
+import time
+import os
+import sys
+# Ajouter le dossier parent au sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from gaze_tracking import GazeTracking
 from main import CHEAT_LIST
-import time
 
-st.title("Webcam Live Feed")
+st.title("Webcam Live Feed avec détection des yeux")
 
-end = False
-global_cheat_percentage = 0
+# Initialiser les objets dans la session s'ils n'existent pas déjà
+if 'cap' not in st.session_state:
+    st.session_state.cap = cv2.VideoCapture(0)
+if 'gaze' not in st.session_state:
+    st.session_state.gaze = GazeTracking()
 
-# Fonction modifiée pour mesurer la triche sur un court intervalle
-def quick_capture_webcam(duration_seconds=3):
-    """Capture la webcam pendant une durée limitée et retourne le pourcentage de triche"""
-    global CHEAT_LIST
-    
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        st.error("Erreur : Impossible d'ouvrir la webcam.")
-        return 0
-    
-    # Conteneurs pour l'affichage
-    stframe = st.empty()
-    text_area = st.empty()
-    gaze = GazeTracking()
-    
-    # S'assurer que la liste est vide
+cap = st.session_state.cap
+gaze = st.session_state.gaze
+
+# Vérifier que la webcam est accessible
+if not cap.isOpened():
+    st.error("Erreur: Impossible d'ouvrir la webcam.")
+    st.stop()
+
+# Un seul widget de démarrage, avec une clé unique
+start_detection = st.checkbox("Démarrer la détection", key="start_detection")
+
+# Conteneurs pour afficher la vidéo et le statut
+frame_placeholder = st.empty()
+status_placeholder = st.empty()
+
+if start_detection:
+    # Réinitialiser la liste de détection
     CHEAT_LIST.clear()
-    
-    # Enregistrer l'heure de début
-    start_time = time.time()
-    end_time = start_time + duration_seconds
-    
-    # Boucle limitée dans le temps
-    while time.time() < end_time:
+    # Boucle de streaming
+    while st.session_state.start_detection:
         ret, frame = cap.read()
         if not ret:
-            st.error("Erreur : Impossible de lire le flux de la webcam.")
-            break
-        
-        # Analyser le regard
-        gaze.refresh(frame)
-        new_frame = gaze.annotated_frame()
-        
-        # Détecter la triche
-        cheat = False
-        if gaze.is_right() or gaze.is_left():
-            cheat = True
-        
-        # Ajouter à la liste globale
-        CHEAT_LIST.append(cheat)
-        
-        # Calculer le pourcentage de triche
-        cheat_percentage = (sum(CHEAT_LIST) / len(CHEAT_LIST)) * 100 if CHEAT_LIST else 0
-        
-        # Mettre à jour l'affichage
-        text_area.write(f"Surveillance en cours: {cheat_percentage:.2f}% de triche détectée")
-        
-        # Convertir et afficher l'image
-        frame_rgb = cv2.cvtColor(new_frame, cv2.COLOR_BGR2RGB)
-        stframe.image(frame_rgb)
-    
-    # Libérer les ressources
-    cap.release()
-    
-    # Effacer les éléments d'interface temporaires
-    stframe.empty()
-    text_area.empty()
-    
-    # Retourner le pourcentage final
-    final_percentage = (sum(CHEAT_LIST) / len(CHEAT_LIST)) * 100 if CHEAT_LIST else 0
-    return final_percentage
-
-# Fonction originale pour la rétro-compatibilité
-def capture_webcam():
-
-    while not end:
-        ret, frame = cap.read()
-        if not ret:
-            st.error("Erreur : Impossible de lire le flux de la webcam.")
+            st.error("Erreur lors de la capture de la vidéo.")
             break
 
+        # Actualiser la détection du regard
         gaze.refresh(frame)
-        new_frame = gaze.annotated_frame()
+        annotated_frame = gaze.annotated_frame()
 
-        cheat = False
-        if gaze.is_right() or gaze.is_left():
-            cheat = True
+        # Exemple d'annotation : dessiner un cercle au centre de l'image
+        height, width, _ = annotated_frame.shape
+        center_x, center_y = width // 2, height // 2
+        cv2.circle(annotated_frame, (center_x, center_y), 10, (0, 255, 0), 2)
 
+        # Détection de la "triche" (regard à droite ou à gauche)
+        cheat = gaze.is_right() or gaze.is_left()
         CHEAT_LIST.append(cheat)
-        
-        # Calculer le pourcentage de triche
         cheat_percentage = (sum(CHEAT_LIST) / len(CHEAT_LIST)) * 100 if CHEAT_LIST else 0
-        
-        # Mettre à jour le texte en temps réel
-        status_area.write("ON" if CHEAT_LIST else "OFF")
-        text_area.write(f"Cheating percentage: {cheat_percentage:.2f}%")
 
-        # Convertir l'image de BGR (OpenCV) à RGB (Streamlit)
-        frame_rgb = cv2.cvtColor(new_frame, cv2.COLOR_BGR2RGB)
+        # Mettre à jour l'affichage du statut et de la vidéo
+        status_placeholder.text(f"Cheating percentage: {cheat_percentage:.2f}%")
+        frame_rgb = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
+        frame_placeholder.image(frame_rgb)
 
-        # Afficher l'image dans Streamlit
-        stframe.image(frame_rgb)
-    
+        # Petite pause pour limiter le taux de rafraîchissement
+        time.sleep(0.03)
+
+        # Forcer le re-run du script pour prendre en compte l'état de la checkbox
+        # (la boucle va se relancer si st.session_state.start_detection reste True)
+        # Sinon, la boucle s'arrêtera dès que l'utilisateur décoche la case.
+        st.experimental_rerun()
+else:
+    st.write("Détection arrêtée.")
+
+# Libération de la webcam si l'utilisateur arrête la détection
+if not st.session_state.start_detection and cap.isOpened():
     cap.release()
-    cv2.destroyAllWindows()
-    return cheat_percentage
