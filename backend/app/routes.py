@@ -2,7 +2,7 @@ from fastapi import APIRouter, Query, HTTPException, Body, Request
 import logging
 from utils_session import *
 from __init__ import supabase
-from models import UserModel
+from models import UserModel, ExamSession
 from db import db, User, exam_sessions_table, exam_results_table, Session, Result
 import time
 import uuid
@@ -71,19 +71,19 @@ async def start_exam(request: Request):
     """Start a new exam session"""
     # Récupérer les données JSON du corps de la requête
     req_data = await request.json()
-    
+
     # Extraire les données du JSON
     email = req_data.get("email")
     exam_id = req_data.get("exam_id")
     exam_name = req_data.get("exam_name", "Unknown Exam")
-    
+
     if not email or not exam_id:
         return {"status": "error", "message": "Email and exam_id are required"}
-    
+
     # Créer un ID de session unique
     session_id = str(uuid.uuid4())
     timestamp = int(time.time())
-    
+
     # Créer un enregistrement dans la table "exam_sessions"
     session_data = {
         "email": email,
@@ -92,13 +92,13 @@ async def start_exam(request: Request):
         "timestamp": timestamp,
         "session_id": session_id
     }
-    
+
     # Stocker les données dans la table exam_sessions
     exam_sessions_table.insert(session_data)
-    
+
     return {
-        "status": "success", 
-        "message": "Exam session started", 
+        "status": "success",
+        "message": "Exam session started",
         "session_id": session_id,
         "email": email,
         "exam_id": exam_id,
@@ -111,7 +111,7 @@ async def submit_results(request: Request):
     """Submit exam results"""
     # Récupérer les données JSON du corps de la requête
     req_data = await request.json()
-    
+
     # Extraire les données du JSON
     email = req_data.get("email")
     exam_id = req_data.get("exam_id")
@@ -119,10 +119,10 @@ async def submit_results(request: Request):
     cheat_score = req_data.get("cheat_score")
     passed = req_data.get("passed")
     details = req_data.get("details", {})
-    
+
     if not all([email, exam_id, score is not None, cheat_score is not None, passed is not None]):
         return {"status": "error", "message": "Missing required fields"}
-    
+
     # Créer un enregistrement pour les résultats
     result_data = {
         "email": email,
@@ -133,10 +133,10 @@ async def submit_results(request: Request):
         "details": details,
         "timestamp": int(time.time())
     }
-    
+
     # Stocker les données dans la table exam_results
     exam_results_table.insert(result_data)
-    
+
     return {
         "status": "success",
         "message": "Exam results submitted successfully",
@@ -149,10 +149,10 @@ async def get_results(email: str):
     """Get exam results for a specific user"""
     # Recherche des résultats pour cet email
     results = exam_results_table.search(Result.email == email)
-    
+
     if not results:
         return {"status": "not_found", "message": "No results found for this email"}
-    
+
     # Format the results
     formatted_results = []
     for result in results:
@@ -164,9 +164,20 @@ async def get_results(email: str):
             "timestamp": result["timestamp"]
         }
         formatted_results.append(formatted_result)
-    
+
     return {
         "status": "success",
         "email": email,
         "results": formatted_results
     }
+
+
+
+
+@router.get("/get_last_exam", response_model=Optional[ExamSession])
+def get_last_exam():
+    sessions = [s for s in db.all() if "timestamp" in s]
+    if not sessions:
+        return None
+    last_session = max(sessions, key=lambda x: x["timestamp"])
+    return ExamSession(**last_session)

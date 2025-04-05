@@ -27,7 +27,7 @@
     "react-router-dom": "^6.26.2",
     "vite": "^5.4.8",
     "web3": "^4.13.0"
-  },  
+  },
   "optionalDependencies": {
     "esbuild": "^0.14.0"
   },
