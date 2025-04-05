@@ -7,6 +7,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Contract from "./pages/Contract";
 import HomePage from "./pages/HomePage";
+import AdminPage from "./pages/AdminPage";
 // import NFT from "./pages/NFT";
 import ServerSideVerification from "./pages/ServerSideVerification";
 import Transaction from "./pages/Transaction";
@@ -23,6 +24,7 @@ function App() {
               <Routes>
                 <Route path="/">
                   <Route index element={<HomePage />} />
+                  <Route path="admin" element={<AdminPage />} />
                   <Route path="contract" element={<Contract />} />
                   <Route path="transaction" element={<Transaction />} />
                   <Route path="server-side-verification" element={<ServerSideVerification />} />

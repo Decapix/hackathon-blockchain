@@ -97,9 +97,8 @@ export const Playground = ({ children }: IPlaygroundProps) => {
   );
 
   useEffect(() => {
-    if (status === ADAPTER_STATUS.READY) {
-      connect();
-    } else if (status === ADAPTER_STATUS.CONNECTED) {
+    // On ne déclenche plus automatiquement la connexion
+    if (status === ADAPTER_STATUS.CONNECTED) {
       setNewWalletProvider(provider);
     }
   }, [web3Auth, status, provider, connect, setNewWalletProvider]);
