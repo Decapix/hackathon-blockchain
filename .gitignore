@@ -87,5 +87,3 @@ yarn-error.log*
 
 # System Files
 Thumbs.db
-/web3auth-g/node_modules
-/web3auth-g/node_modules
