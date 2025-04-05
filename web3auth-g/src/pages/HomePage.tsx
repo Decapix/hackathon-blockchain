@@ -8,13 +8,13 @@ import web3AuthLogoWhite from "../assets/web3authLogoWhite.svg";
 function HomePage() {
   const { isConnected, connect } = useWeb3Auth();
   const navigate = useNavigate();
-  
+
   // Nous supprimons la redirection automatique
-  
+
   const handleConnect = () => {
     connect().then(() => {
       // Redirection manuelle après connexion réussie
-      navigate("/admin");
+      navigate("/menu");
     });
   };
 
