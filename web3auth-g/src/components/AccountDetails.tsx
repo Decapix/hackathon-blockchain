@@ -10,6 +10,7 @@ interface AccountDetailsProps {
 }
 
 function AccountDetails({ children }: AccountDetailsProps) {
+  
   const {
     address,
     balance,
@@ -26,6 +27,7 @@ function AccountDetails({ children }: AccountDetailsProps) {
   const [addressToShow, setAddressToShow] = useState<string>(address || "");
   const [selectedChain, setSelectedChain] = useState<string>(Object.keys(chainList)[0]);
   const [chainDetails, setChainDetails] = useState<CustomChainConfig>(chainList[selectedChain]);
+  
 
   useEffect(() => {
     setAddressToShow(address || "");
