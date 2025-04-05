@@ -3,7 +3,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy package files first for better caching
-COPY package.json package-lock.json ./
+COPY package.json ./
 
 # Use clean npm install to ensure all dependencies are properly installed
 RUN npm install
