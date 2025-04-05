@@ -24,10 +24,11 @@ const web3AuthOptions: Web3AuthOptions = {
 
 const authAdapter = new AuthAdapter({
   loginSettings: {
-    mfaLevel: MFA_LEVELS.OPTIONAL,
+    mfaLevel: MFA_LEVELS.NONE,
   },
   adapterSettings: {
     uxMode: UX_MODE.REDIRECT, // "redirect" | "popup"
+    redirectUrl: window.location.origin + "/menu",
   },
 });
 
