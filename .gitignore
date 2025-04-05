@@ -58,7 +58,7 @@ migrations_init/
 
 
 # Dependencies
-web3auth-g/node_modules
+node_modules/
 /.pnp
 .pnp.js
 
