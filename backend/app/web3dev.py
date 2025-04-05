@@ -1,83 +1,104 @@
-
 from web3 import Web3
-import solcx
-from solcx import compile_source
+import json
+from eth_account.messages import encode_defunct
 
+# Connexion à un nœud Ethereum (par exemple, Infura)
+infura_url = 'https://rpc1.bahamut.io'
+web3 = Web3(Web3.HTTPProvider(infura_url))
 
-# Initialize Web3 connection
-web3 = Web3(Web3.HTTPProvider('https://rpc1.bahamut.io'))
+# Vérifiez la connexion
+if not web3.is_connected():
+    raise ConnectionError("Failed to connect to Ethereum node")
 
-def get_latest_block():
-    """Function to get the latest block number from the Ethereum blockchain."""
-    if web3.is_connected():
-        latest_block = web3.eth.block_number
-        return {"latest_block": latest_block}
-    else:
-        return {"error": "Failed to connect to the Ethereum node"}
+# Adresse du contrat déployé
+contract_address = '0xB0F3C35906360e3e6B779FBA21ca812d5d69a377'
 
+# Lire le fichier ABI.js
+with open('ABI.js', 'r') as file:
+    contract_abi = json.load(file)
 
-def compile_solidity_contract(file_path):
+# Charger le contrat
+contract = web3.eth.contract(address=contract_address, abi=contract_abi)
+
+# Adresse de l'utilisateur et clé privée (pour signer les transactions)
+user_address = '0xAdresseDeLUtilisateur'
+private_key = 'VotreCléPrivée'
+
+def get_test_score(infura_url, contract_address, contract_abi, user_address):
     """
-    Compiles a Solidity contract from a .sol file.
+    Récupère le score de test d'un utilisateur à partir d'un contrat intelligent Ethereum.
 
-    :param file_path: Path to the .sol file.
-    :return: A tuple containing the contract ABI and bytecode.
+    :param infura_url: URL du nœud Ethereum (par exemple, Infura).
+    :param contract_address: Adresse du contrat déployé.
+    :param contract_abi: ABI du contrat sous forme de liste.
+    :param user_address: Adresse Ethereum de l'utilisateur.
+    :return: Score de test de l'utilisateur.
     """
-    # Read the Solidity contract source code
-    with open(file_path, 'r') as file:
-        contract_source_code = file.read()
 
-    # Compile the Solidity contract
-    compiled_sol = compile_source(contract_source_code)
-
-    # Extract the contract interface (ABI) and bytecode
-    contract_id = list(compiled_sol.keys())[0]  # Get the first contract ID
-    contract_interface = compiled_sol[contract_id]['abi']
-    bytecode = compiled_sol[contract_id]['bin']
-
-    return contract_interface, bytecode
+    # Appeler la fonction de lecture
+    try:
+        score = contract.functions.getTestScore(user_address).call()
+        return score
+    except Exception as e:
+        raise RuntimeError(f"Erreur lors de l'appel de la fonction : {e}")
 
 
 
-def deploy_contract(contract_interface, bytecode, provider_url, account_address, private_key):
-    """
-    Deploys a compiled contract to the Ethereum blockchain.
 
-    :param contract_interface: The ABI of the contract.
-    :param bytecode: The bytecode of the contract.
-    :param provider_url: The URL of the Ethereum node.
-    :param account_address: The address of the deploying account.
-    :param private_key: The private key of the deploying account.
-    :return: The address of the deployed contract.
-    """
-    # Connect to the Ethereum node
-    web3 = Web3(Web3.HTTPProvider(provider_url))
 
-    # Set the default account
-    web3.eth.default_account = account_address
 
-    # Create the contract instance
-    MyContract = web3.eth.contract(abi=contract_interface, bytecode=bytecode)
+def sign_message(message, private_key):
+    # Encoder le message pour la signature
+    encoded_message = encode_defunct(text=message)
+    # Signer le message encodé
+    signed_message = Account.sign_message(encoded_message, private_key=private_key)
+    return signed_message.signature
 
-    # Build the transaction to deploy the contract
-    transaction = MyContract.constructor("Hello, world!").build_transaction({
-        'from': account_address,
-        'nonce': web3.eth.get_transaction_count(account_address),
-        'gas': 2000000,
-        'gasPrice': web3.toWei('50', 'gwei'),
-    })
 
-    # Sign the transaction
-    signed_txn = web3.eth.account.sign_transaction(transaction, private_key=private_key)
+# Enregistrer le consentement
+def record_consent(email_hash, test_id):
+    consent_message = "RECORD_CONSENT" + user_address[2:] + email_hash.hex() + test_id.hex()
+    consent_signature = sign_message(consent_message, private_key)
 
-    # Send the transaction
-    tx_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    auth_message = "AUTH_MESSAGE"  # Remplacez par le message d'authentification approprié
+    auth_signature = sign_message(auth_message, private_key)
 
-    # Wait for the transaction to be mined
-    tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+    tx_hash = contract.functions.recordConsent(
+        email_hash,
+        test_id,
+        consent_signature,
+        auth_signature
+    ).transact({'from': user_address})
 
-    # Get the contract address
-    contract_address = tx_receipt.contractAddress
-    print(f"Contract deployed at address: {contract_address}")
+    receipt = web3.eth.waitForTransactionReceipt(tx_hash)
+    print(f"Consentement enregistré : {receipt}")
 
-    return contract_address
+# Démarrer un test
+def start_test(test_id, total_questions):
+    start_message = "START_TEST" + user_address[2:] + test_id.hex() + str(total_questions)
+    start_signature = sign_message(start_message, private_key)
+
+    tx_hash = contract.functions.startTestWithSignature(
+        test_id,
+        total_questions,
+        start_signature
+    ).transact({'from': user_address})
+
+    receipt = web3.eth.waitForTransactionReceipt(tx_hash)
+    print(f"Test démarré : {receipt}")
+
+# Compléter un test
+def complete_test(test_id, correct_answers, fraud_score, metadata_uri):
+    complete_message = "COMPLETE_TEST" + user_address[2:] + test_id.hex() + str(correct_answers) + str(fraud_score) + metadata_uri
+    complete_signature = sign_message(complete_message, private_key)
+
+    tx_hash = contract.functions.completeTestWithSignature(
+        test_id,
+        correct_answers,
+        fraud_score,
+        metadata_uri,
+        complete_signature
+    ).transact({'from': user_address})
+
+    receipt = web3.eth.waitForTransactionReceipt(tx_hash)
+    print(f"Test complété : {receipt}")
