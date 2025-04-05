@@ -2,32 +2,17 @@ import streamlit as st
 import cv2
 import time
 from GazeTracking.gaze_tracking import GazeTracking
+from questions import QUESTIONS
 
 st.title("Questions QCM et Webcam")
-
-# Liste des questions
-questions = [
-    {
-        "question": "Quel est la couleur du cheval blanc d'Henri IV ?",
-        "options": ["Blanc", "Noir", "Gris"]
-    },
-    {
-        "question": "Combien de lettres dans le mot 'chat' ?",
-        "options": ["2", "3", "4"]
-    },
-    {
-        "question": "Quel est le résultat de 2 + 2 ?",
-        "options": ["3", "4", "5"]
-    }
-]
 
 # Initialiser l'index de la question
 if 'question_index' not in st.session_state:
     st.session_state.question_index = 0
 
 # Affichage de la question actuelle
-if st.session_state.question_index < len(questions):
-    q = questions[st.session_state.question_index]
+if st.session_state.question_index < len(QUESTIONS):
+    q = QUESTIONS[st.session_state.question_index]
     st.header(f"Question {st.session_state.question_index + 1}")
     choice = st.radio(q["question"], q["options"], key=f"question_{st.session_state.question_index}")
 
@@ -63,6 +48,16 @@ if start_webcam:
 
         gaze.refresh(frame)
         new_frame = gaze.annotated_frame()
+
+        text = "CHEATING!!!"
+        if gaze.is_right():
+            text = "CHEATING!!!"
+        elif gaze.is_left():
+            text = "CHEATING!!!"
+        elif gaze.is_center():
+            text = "Looking center"
+
+        cv2.putText(new_frame, text, (60, 60), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2)
         frame = cv2.cvtColor(new_frame, cv2.COLOR_BGR2RGB)
         frame_placeholder.image(frame)
         time.sleep(0.03)
