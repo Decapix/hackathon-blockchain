@@ -9,15 +9,13 @@ function HomePage() {
   const { isConnected, connect } = useWeb3Auth();
   const navigate = useNavigate();
   
-  // Rediriger vers la page admin si déjà connecté
-  useEffect(() => {
-    if (isConnected) {
-      navigate("/admin");
-    }
-  }, [isConnected, navigate]);
+  // Nous supprimons la redirection automatique
   
   const handleConnect = () => {
-    connect();
+    connect().then(() => {
+      // Redirection manuelle après connexion réussie
+      navigate("/admin");
+    });
   };
 
   return (
@@ -26,8 +24,16 @@ function HomePage() {
       <div className="flex flex-1 overflow-hidden">
         {isConnected ? (
           <div className="w-full h-full flex flex-col bg-gray-50 items-center justify-center">
-            <h1 className="text-3xl font-bold text-center">Redirection en cours...</h1>
-            <p className="mt-4">Vous êtes connecté, redirection vers le tableau de bord...</p>
+            <h1 className="text-3xl font-bold text-center">Vous êtes connecté !</h1>
+            <p className="mt-4">Bienvenue sur notre plateforme sécurisée.</p>
+            <div className="mt-8">
+              <button
+                onClick={() => navigate('/admin')}
+                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Accéder au tableau de bord
+              </button>
+            </div>
           </div>
         ) : (
           <div className="w-full h-full flex flex-col bg-gray-50 items-center justify-center">

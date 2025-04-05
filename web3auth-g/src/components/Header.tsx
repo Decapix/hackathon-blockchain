@@ -48,12 +48,7 @@ const Header = () => {
                   paddingRight: "15px",
                 }}
               />
-              <div className="border-l-2 text-lg sm:text-xl text-gray-900 px-3 items-center">SDK Playground</div>
-            </div>
-            <div className="flex flex-row justify-center items-center no-underline w-max overflow-hidden flex-wrap m-0 p-0 rounded-lg bg-purple_100 mt-0">
-              <div className="flex flex-col justify-center text-center items-center w-max font-medium text-xs sm:text-s leading-[150%] text-purple_800 flex-wrap m-0 px-2 sm:px-3 py-0.5;">
-                {windowDimensions.width > 425 ? "Plug and Play Modal" : "PnP Modal"}
-              </div>
+              <div className="border-l-2 text-lg sm:text-xl text-gray-900 px-3 items-center">Ma Plateforme</div>
             </div>
           </div>
           <div className="flex-col flex-row mt-0 items-center lg:flex hidden">
