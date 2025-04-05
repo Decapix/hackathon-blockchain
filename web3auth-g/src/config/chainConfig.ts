@@ -4,10 +4,10 @@ export const chain: {
   [key: string]: CustomChainConfig;
 } = {
   bahamut: {
-    chainNamespace: CHAIN_NAMESPACES.OTHER,
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
     chainId: "0x142d",
-    displayName: "bahamut Mainnet",
-    rpcTarget: "https://bahamut-rpc.publicnode.com",
+    displayName: "Bahamut Mainnet",
+    rpcTarget: "https://bahamut-rpc.publicnode.com/",
     blockExplorerUrl: "https://horizon.ftnscan.com",
     ticker: "FTN",
     tickerName: "Bahamut FTN",
