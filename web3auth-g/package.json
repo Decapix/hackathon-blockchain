@@ -16,7 +16,6 @@
     "@web3auth/modal-react-hooks": "^9.7.0",
     "@web3auth/solana-provider": "^9.7.0",
     "@web3auth/wallet-services-plugin-react-hooks": "^9.7.0",
-    "esbuild": "^0.24.0",
     "ethers": "^6.13.2",
     "hamburger-react": "^2.5.1",
     "jose": "^5.9.2",
@@ -24,6 +23,7 @@
     "react-dom": "^18.3.1",
     "react-js-pagination": "^3.0.3",
     "react-json-formatter": "^0.4.0",
+    "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.26.2",
     "vite": "^5.4.8",
     "web3": "^4.13.0"

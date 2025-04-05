@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import QRCode from "react-qr-code";
 
 interface StyleObject {
   [key: string]: string | number | StyleObject;
@@ -8,9 +9,18 @@ interface StyleObject {
 
 const Certifications: React.FC = () => {
   const navigate = useNavigate();
+  const [zoomedQR, setZoomedQR] = useState<string | null>(null);
 
   const handleBackClick = (): void => {
     navigate("/menu");
+  };
+
+  const handleQRCodeClick = (url: string): void => {
+    setZoomedQR(url);
+  };
+
+  const closeZoomedQR = (): void => {
+    setZoomedQR(null);
   };
 
   return (
@@ -83,17 +93,30 @@ const Certifications: React.FC = () => {
                 <h3 style={{ margin: "0", color: "#00c3ff" }}>Blockchain Developer</h3>
                 <p style={{ margin: "5px 0 0", fontSize: "0.9rem", opacity: "0.7" }}>Issued on March 12, 2025</p>
               </div>
-              <div
-                style={{
-                  backgroundColor: "#00c3ff20",
-                  color: "#00c3ff",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                  fontSize: "0.8rem",
-                  fontWeight: "bold"
-                } as React.CSSProperties}
-              >
-                Vérifié
+              <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+                <div
+                  style={{
+                    backgroundColor: "#00c3ff20",
+                    color: "#00c3ff",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    fontSize: "0.8rem",
+                    fontWeight: "bold"
+                  } as React.CSSProperties}
+                >
+                  Verified
+                </div>
+                <div 
+                  style={{ 
+                    backgroundColor: "white", 
+                    padding: "5px", 
+                    borderRadius: "5px",
+                    cursor: "pointer"
+                  }}
+                  onClick={() => handleQRCodeClick("http://pasdelien.com")}
+                >
+                  <QRCode value="http://pasdelien.com" size={50} />
+                </div>
               </div>
             </div>
             
@@ -112,17 +135,30 @@ const Certifications: React.FC = () => {
                 <h3 style={{ margin: "0", color: "#00c3ff" }}>Smart Contracts Expert</h3>
                 <p style={{ margin: "5px 0 0", fontSize: "0.9rem", opacity: "0.7" }}>Issued on January 27, 2025</p>
               </div>
-              <div
-                style={{
-                  backgroundColor: "#00c3ff20",
-                  color: "#00c3ff",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                  fontSize: "0.8rem",
-                  fontWeight: "bold"
-                } as React.CSSProperties}
-              >
-                Vérifié
+              <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+                <div
+                  style={{
+                    backgroundColor: "#00c3ff20",
+                    color: "#00c3ff",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    fontSize: "0.8rem",
+                    fontWeight: "bold"
+                  } as React.CSSProperties}
+                >
+                  Verified
+                </div>
+                <div 
+                  style={{ 
+                    backgroundColor: "white", 
+                    padding: "5px", 
+                    borderRadius: "5px",
+                    cursor: "pointer"
+                  }}
+                  onClick={() => handleQRCodeClick("http://pasdelien.com")}
+                >
+                  <QRCode value="http://pasdelien.com" size={50} />
+                </div>
               </div>
             </div>
           </div>
@@ -174,6 +210,59 @@ const Certifications: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal pour afficher le QR code en grand */}
+      {zoomedQR && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            cursor: "pointer"
+          }}
+          onClick={closeZoomedQR}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "10px",
+              boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <QRCode value={zoomedQR} size={250} />
+            <p style={{ color: "#121212", fontSize: "16px", textAlign: "center" }}>
+              {zoomedQR}
+            </p>
+            <button
+              onClick={closeZoomedQR}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#6a98f0",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontWeight: "bold"
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
