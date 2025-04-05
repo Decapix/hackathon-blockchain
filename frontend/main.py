@@ -1,51 +1,49 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-import time
 
-# Configuration de la page
-st.set_page_config(page_title="Bienvenue", page_icon="🏥", layout="wide")
+# Configuration de la page et style
+st.set_page_config(page_title="Connexion", page_icon="🔑", layout="centered")
 
-# Titre principal
-st.title("🏥 Démo Streamlit : Simplicité & Puissance")
+global CHEAT_LIST
+CHEAT_LIST = []
 
-# Introduction
+# Custom CSS
 st.markdown("""
-Bienvenue sur cette démonstration **interactive** de Streamlit !  
-Streamlit permet de créer facilement des applications web **data-driven** avec très peu de code Python.
+<style>
+    .stButton > button {
+        background: linear-gradient(45deg, #2C3E50, #3498DB);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 0.5rem 2rem;
+        transition: all 0.3s;
+    }
+    .stButton > button:hover {
+        background: linear-gradient(45deg, #3498DB, #2C3E50);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+    .block-chain-title {
+        background: linear-gradient(45deg, #3498DB, #2ECC71);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 3em;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+</style>
+""", unsafe_allow_html=True)
 
----
+# Interface de connexion avec style blockchain
+st.markdown('<h1 class="block-chain-title">DecapiX Login</h1>', unsafe_allow_html=True)
 
-""")
+# Ajouter une image ou un logo blockchain (optionnel)
+st.markdown("""
+<div style='text-align: center; margin-bottom: 2rem;'>
+    🔗 Secure Blockchain Authentication 🔒
+</div>
+""", unsafe_allow_html=True)
 
-# Colonne de gauche : formulaire
-st.header("📝 Saisie utilisateur")
-with st.form("formulaire_utilisateur"):
-    nom = st.text_input("Quel est votre nom ?")
-    age = st.slider("Quel âge avez-vous ?", 0, 100, 25)
-    humeur = st.selectbox("Comment vous sentez-vous aujourd'hui ?", ["😊 Bien", "😐 Moyen", "😞 Fatigué"])
-    submit = st.form_submit_button("Envoyer")
-    if submit:
-        st.success(f"Bonjour **{nom}**, {age} ans. Contente de savoir que vous vous sentez *{humeur}* !")
-
-# Colonne de droite : affichage dynamique
-st.header("📊 Données aléatoires & visualisation")
-df = pd.DataFrame(
-    np.random.randn(100, 3),
-    columns=["Capteurs A", "Capteurs B", "Capteurs C"]
-)
-st.line_chart(df)
-
-# Progress bar pour effet waouh
-st.header("⏳ Chargement simulé")
-progress_bar = st.progress(0)
-status_text = st.empty()
-for i in range(100):
-    status_text.text(f"Chargement… {i+1}%")
-    progress_bar.progress(i + 1)
-    time.sleep(0.01)
-st.success("C'est prêt ! 🎉")
-
-# Footer
-st.markdown("---")
-st.markdown("Réalisé avec ❤️ par [Streamlit](https://streamlit.io)")
+if st.button("Sign In"):
+    st.session_state.logged_in = True
+    st.switch_page("pages/home.py")
