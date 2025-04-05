@@ -48,7 +48,7 @@ const Header = () => {
                   paddingRight: "15px",
                 }}
               />
-              <div className="border-l-2 text-lg sm:text-xl text-gray-900 px-3 items-center">Ma Plateforme</div>
+              <div className="border-l-2 text-lg sm:text-xl text-gray-900 px-3 items-center">My Platform</div>
             </div>
           </div>
           <div className="flex-col flex-row mt-0 items-center lg:flex hidden">
