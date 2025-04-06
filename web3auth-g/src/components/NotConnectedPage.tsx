@@ -8,8 +8,38 @@ const NotConnectedPage = () => {
   const { isLoading } = usePlayground();
 
   return (
-    <div className="w-full h-full flex flex-1 flex-col bg-gray-50 items-center justify-center overflow-scroll p-4">
-      <div className="max-w-md mx-auto mt-4 text-center text-gray-500">
+    <div style={{
+        backgroundImage: "url('/img.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: "#121212",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#e0e0e0",
+        padding: "20px"
+      }}>
+      <h1 style={{ 
+        marginBottom: "40px", 
+        color: "#6a98f0",
+        fontSize: "2.5rem",
+        fontWeight: "700"
+      }}>
+        Welcome to <span style={{ color: "#00c3ff" }}>La Certif</span>
+      </h1>
+      <div style={{
+        maxWidth: "800px",
+        width: "100%",
+        backgroundColor: "rgba(18, 18, 18, 0.85)",
+        backdropFilter: "blur(10px)",
+        borderRadius: "16px",
+        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
+        padding: "40px",
+        textAlign: "center"
+      }}>
         {isLoading ? (
           <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
