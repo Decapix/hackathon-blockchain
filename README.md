@@ -1,9 +1,4 @@
-<p align="center">
-  <img src="logo.png" alt="LaCertif Logo" width="200"/>
-</p>
-
-# Secure Exam Platform with Blockchain Certification
-
+![LaCertif Logo](logo.png)
 # Secure Exam Platform with Blockchain Certification
 
 ## Project Overview
