@@ -34,6 +34,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      { "internalType": "bytes32", "name": "emailHash", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "testId", "type": "bytes32" },
+      { "internalType": "bytes", "name": "consentSignature", "type": "bytes" },
+      { "internalType": "uint64", "name": "consentTimestamp", "type": "uint64" },
+      { "internalType": "uint64", "name": "startTime", "type": "uint64" },
+      { "internalType": "uint64", "name": "endTime", "type": "uint64" },
+      { "internalType": "uint16", "name": "totalQuestions", "type": "uint16" },
+      { "internalType": "uint16", "name": "correctAnswers", "type": "uint16" },
+      { "internalType": "uint8", "name": "fraudScore", "type": "uint8" },
+      { "internalType": "string", "name": "metadataURI", "type": "string" },
+      { "internalType": "string", "name": "siweMessage", "type": "string" }
+    ],
+    "name": "completeTestFull",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [{ "internalType": "address", "name": "user", "type": "address" }],
     "name": "getTestSession",
     "outputs": [
