@@ -1,7 +1,9 @@
 import { ADAPTER_STATUS, CustomChainConfig, IProvider, WALLET_ADAPTERS } from "@web3auth/base";
 import { useWeb3Auth } from "@web3auth/modal-react-hooks";
+import { SiweMessage } from "siwe";
 import * as jose from "jose";
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { ethers } from "ethers";
 
 import { chain } from "../config/chainConfig";
 import { getWalletProvider, IWalletProvider } from "./walletProvider";
@@ -31,6 +33,7 @@ export interface IPlaygroundContext {
   verifyServerSide: (idToken: string) => Promise<any>;
   switchChain: (customChainConfig: CustomChainConfig) => Promise<void>;
   updateConnectedChain: (network: string | CustomChainConfig) => void;
+  signInWithEthereum: () => Promise<{ message: string; signature: string }>;
 }
 
 export const PlaygroundContext = createContext<IPlaygroundContext>({
@@ -58,6 +61,7 @@ export const PlaygroundContext = createContext<IPlaygroundContext>({
   verifyServerSide: async () => {},
   switchChain: async () => null,
   updateConnectedChain: () => {},
+  signInWithEthereum: async () => ({ message: "", signature: "" }),
 });
 
 interface IPlaygroundProps {
@@ -340,6 +344,39 @@ export const Playground = ({ children }: IPlaygroundProps) => {
     }
   };
 
+  const signInWithEthereum = async (): Promise<{ message: string; signature: string }> => {
+    if (!provider) {
+      uiConsole("Provider non initialisé");
+      throw new Error("Provider not ready");
+    }
+
+    const ethersProvider = new ethers.BrowserProvider(provider as any);
+    const signer = await ethersProvider.getSigner();
+    const address = await signer.getAddress();
+    const chainId = await signer.provider.getNetwork().then((n) => Number(n.chainId));
+
+    const domain = window.location.host;
+    const origin = window.location.origin;
+    const issuedAt = new Date().toISOString();
+    
+    const siweMessage = new SiweMessage({
+      domain,
+      address,
+      statement: "Authentification sur La Certif",
+      uri: origin,
+      version: "1",
+      chainId,
+      issuedAt,
+    });
+
+    const message = siweMessage.prepareMessage();
+    const signature = await signer.signMessage(message);
+
+    uiConsole("✅ Message SIWE signé", { message, signature });
+
+    return { message, signature };
+  };
+
   const contextProvider = {
     walletProvider,
     isLoading,
@@ -365,6 +402,7 @@ export const Playground = ({ children }: IPlaygroundProps) => {
     getIdToken,
     switchChain,
     updateConnectedChain,
+    signInWithEthereum,
   };
   return <PlaygroundContext.Provider value={contextProvider}>{children}</PlaygroundContext.Provider>;
 };
