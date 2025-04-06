@@ -11,12 +11,12 @@ const clientId = "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw
 
 const privateKeyProvider = new EthereumPrivateKeyProvider({
   config: {
-    chainConfig: chain.bahamut,
+    chainConfig: chain.ethereum,
   },
 });
 
 const web3AuthOptions: Web3AuthOptions = {
-  chainConfig: chain.bahamut,
+  chainConfig: chain.ethereum,
   clientId,
   web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
   privateKeyProvider,
@@ -36,6 +36,7 @@ const walletServicesPlugin = new WalletServicesPlugin({
   wsEmbedOpts: {},
   walletInitOptions: {
     whiteLabel: { showWidgetButton: false },
+    whiteLabel: { showWidgetButton: false }, // Désactivation du bouton de widget
     confirmationStrategy: CONFIRMATION_STRATEGY.MODAL,
   },
 });

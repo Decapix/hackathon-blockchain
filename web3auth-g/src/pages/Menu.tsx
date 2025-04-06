@@ -1,13 +1,44 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
-
-interface StyleProps {
-  [key: string]: string | number;
-}
+import { useWeb3Auth } from "@web3auth/modal-react-hooks";
+import DisconnectWeb3AuthButton from "../components/DisconnectWeb3AuthButton";
 
 const Menu: React.FC = () => {
   const navigate = useNavigate();
+  const { isConnected, connect, provider } = useWeb3Auth();
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      if (isConnected && provider) {
+        try {
+          // Cast the provider to 'any' to access getUserInfo method
+          const web3authProvider = provider as any;
+          const userInfo = await web3authProvider.getUserInfo();
+          if (userInfo.email) {
+            console.log("User email:", userInfo.email);
+            localStorage.setItem('userEmail', userInfo.email);
+          }
+        } catch (error) {
+          console.error("Error getting user info:", error);
+        }
+      }
+      // Définir isLoading à false une fois que la vérification est terminée
+      setIsLoading(false);
+    };
+
+    getUserInfo();
+  }, [isConnected, provider]);
+
+  const handleSignIn = async () => {
+    try {
+      await connect();
+      // After connection, the useEffect will handle getting the user info
+    } catch (error) {
+      console.error("Connection error:", error);
+    }
+  };
 
   const handleExamsClick = (): void => {
     navigate("/exam_list");
@@ -16,7 +47,7 @@ const Menu: React.FC = () => {
   const handleCertificationsClick = (): void => {
     navigate("/certifications");
   };
-  
+
   const handleContractClick = (): void => {
     navigate("/contract");
   };
@@ -24,6 +55,10 @@ const Menu: React.FC = () => {
   return (
     <div 
       style={{
+        backgroundImage: "url('/img.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
         backgroundColor: "#121212",
         minHeight: "100vh",
         display: "flex",
@@ -56,160 +91,199 @@ const Menu: React.FC = () => {
           La <span style={{ color: "#00c3ff" }}>Certif</span>
         </h1>
         
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "20px",
-            maxWidth: "400px",
-            margin: "0 auto"
-          }}
-        >
-          <button
-            onClick={handleCertificationsClick}
-            style={{
-              padding: "16px 24px",
-              fontSize: "1.2rem",
-              fontWeight: "600",
-              backgroundColor: "rgba(255, 20, 147, 0.1)",
-              color: "#ff1493",
-              border: "2px solid rgba(255, 20, 147, 0.7)",
-              borderRadius: "8px",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow: "0 0 10px #ff1493, 0 0 15px rgba(255, 20, 147, 0.4)", // Effet glow réduit
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              overflow: "hidden"
-            }}
-            onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = "rgba(255, 20, 147, 0.2)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 0 15px #ff1493, 0 0 20px rgba(255, 20, 147, 0.6)";
-            }}
-            onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = "rgba(255, 20, 147, 0.1)";
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 0 10px #ff1493, 0 0 15px rgba(255, 20, 147, 0.4)";
-            }}
-          >
-            <span 
-              style={{ 
-                marginRight: "10px",
-                fontSize: "1.4rem"
+        {isLoading ? (
+          // Indicateur de chargement pendant la vérification de la connexion
+          <div style={{ padding: "20px", textAlign: "center" }}>
+            <div
+              style={{
+                display: "inline-block",
+                width: "40px",
+                height: "40px",
+                border: "4px solid rgba(106, 152, 240, 0.3)",
+                borderTop: "4px solid #6a98f0",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite"
               }}
-            >
-              🏆
-            </span>
-            Certifications
-          </button>
-          
-          <button
-            onClick={handleExamsClick}
-            style={{
-              padding: "16px 24px",
-              fontSize: "1.2rem",
-              fontWeight: "600",
-              backgroundColor: "rgba(0, 255, 0, 0.1)",
-              color: "#00ff00", 
-              border: "2px solid rgba(0, 255, 0, 0.7)",
-              borderRadius: "8px",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow: "0 0 10px #00ff00, 0 0 15px rgba(0, 255, 0, 0.4)", // Effet glow réduit
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              overflow: "hidden"
-            }}
-            onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = "rgba(0, 255, 0, 0.2)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 0 15px #00ff00, 0 0 20px rgba(0, 255, 0, 0.6)";
-            }}
-            onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = "rgba(0, 255, 0, 0.1)";
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 0 10px #00ff00, 0 0 15px rgba(0, 255, 0, 0.4)";
-            }}
-          >
-            <span 
-              style={{ 
-                marginRight: "10px",
-                fontSize: "1.4rem"
-              }}
-            >
-              📝
-            </span>
-            Exams
-          </button>
-          
-          <button
-            onClick={handleContractClick}
-            style={{
-              padding: "16px 24px",
-              fontSize: "1.2rem",
-              fontWeight: "600",
-              backgroundColor: "rgba(0, 195, 255, 0.1)",
-              color: "#00c3ff", 
-              border: "2px solid rgba(0, 195, 255, 0.7)",
-              borderRadius: "8px",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow: "0 0 10px #00c3ff, 0 0 15px rgba(0, 195, 255, 0.4)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              overflow: "hidden"
-            }}
-            onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = "rgba(0, 195, 255, 0.2)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 0 15px #00c3ff, 0 0 20px rgba(0, 195, 255, 0.6)";
-            }}
-            onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = "rgba(0, 195, 255, 0.1)";
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 0 10px #00c3ff, 0 0 15px rgba(0, 195, 255, 0.4)";
-            }}
-          >
-            <span 
-              style={{ 
-                marginRight: "10px",
-                fontSize: "1.4rem"
-              }}
-            >
-              📜
-            </span>
-            Smart Contract
-          </button>
-        </div>
-
-        <div 
-          style={{
-            marginTop: "40px",
-            opacity: "0.7",
-            fontSize: "0.9rem"
-          }}
-        >
-          <p>Secured by blockchain technology</p>
-          <div 
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "15px",
-              marginTop: "10px"
-            }}
-          >
-            <span>⚡ Bahamut</span>
-            <span>🔗 Web3</span>
-            <span>🔒 Decentralized</span>
+            />
+            <style>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
+            <p style={{ marginTop: "10px", color: "#6a98f0" }}>Chargement de l'interface...</p>
           </div>
-        </div>
+        ) : !isConnected ? (
+          <button
+            onClick={handleSignIn}
+            style={{
+              padding: "16px 24px",
+              fontSize: "1.2rem",
+              fontWeight: "600",
+              backgroundColor: "rgba(106, 152, 240, 0.1)",
+              color: "#6a98f0",
+              border: "2px solid rgba(106, 152, 240, 0.7)",
+              borderRadius: "8px",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              boxShadow: "0 0 10px #6a98f0, 0 0 15px rgba(106, 152, 240, 0.4)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              overflow: "hidden",
+              marginBottom: "20px",
+              width: "100%",
+              maxWidth: "400px",
+              margin: "0 auto 20px"
+            }}
+            onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = "rgba(106, 152, 240, 0.2)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 0 15px #6a98f0, 0 0 20px rgba(106, 152, 240, 0.6)";
+            }}
+            onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = "rgba(106, 152, 240, 0.1)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 0 10px #6a98f0, 0 0 15px rgba(106, 152, 240, 0.4)";
+            }}
+          >
+            <span
+              style={{
+                marginRight: "10px",
+                fontSize: "1.4rem"
+              }}
+            >
+              🔑
+            </span>
+            Se Connecter
+          </button>
+        ) : (
+          <React.Fragment>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+                maxWidth: "400px",
+                margin: "0 auto"
+              }}
+            >
+              <button
+                onClick={handleCertificationsClick}
+                style={{
+                  padding: "16px 24px",
+                  fontSize: "1.2rem",
+                  fontWeight: "600",
+                  backgroundColor: "rgba(255, 20, 147, 0.1)",
+                  color: "#ff1493",
+                  border: "2px solid rgba(255, 20, 147, 0.7)",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 0 10px #ff1493, 0 0 15px rgba(255, 20, 147, 0.4)", // Effet glow réduit
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  overflow: "hidden"
+                }}
+                onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 20, 147, 0.2)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 0 15px #ff1493, 0 0 20px rgba(255, 20, 147, 0.6)";
+                }}
+                onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 20, 147, 0.1)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 0 10px #ff1493, 0 0 15px rgba(255, 20, 147, 0.4)";
+                }}
+              >
+                <span
+                  style={{
+                    marginRight: "10px",
+                    fontSize: "1.4rem"
+                  }}
+                >
+                  🏆
+                </span>
+                Certifications
+              </button>
+
+              <button
+                onClick={handleExamsClick}
+                style={{
+                  padding: "16px 24px",
+                  fontSize: "1.2rem",
+                  fontWeight: "600",
+                  backgroundColor: "rgba(0, 255, 0, 0.1)",
+                  color: "#00ff00",
+                  border: "2px solid rgba(0, 255, 0, 0.7)",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 0 10px #00ff00, 0 0 15px rgba(0, 255, 0, 0.4)", // Effet glow réduit
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  overflow: "hidden"
+                }}
+                onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = "rgba(0, 255, 0, 0.2)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 0 15px #00ff00, 0 0 20px rgba(0, 255, 0, 0.6)";
+                }}
+                onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = "rgba(0, 255, 0, 0.1)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 0 10px #00ff00, 0 0 15px rgba(0, 255, 0, 0.4)";
+                }}
+              >
+                <span
+                  style={{
+                    marginRight: "10px",
+                    fontSize: "1.4rem"
+                  }}
+                >
+                  📝
+                </span>
+                Exams
+              </button>
+            </div>
+
+            <div
+              style={{
+                marginTop: "40px",
+                opacity: "0.7",
+                fontSize: "0.9rem"
+              }}
+            >
+              <p>Secured by blockchain technology</p>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "15px",
+                  marginTop: "10px"
+                }}
+              >
+                <span>⚡ Bahamut</span>
+                <span>🔗 Web3</span>
+                <span>🔒 Decentralized</span>
+              </div>
+            </div>
+            <div
+              style={{
+                marginTop: "20px",
+                display: "flex",
+                justifyContent: "center"
+              }}
+            >
+              <DisconnectWeb3AuthButton />
+            </div>
+          </React.Fragment>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,17 @@
 import streamlit as st
 import time
+import requests
 from gaze_tracker import capture_webcam
 from questions import QUESTIONS
+
+# Appel de la route get_last_exam et stockage dans des variables non utilisées
+try:
+    last_exam_response = requests.get("http://localhost:8000/get_last_exam")
+    last_exam_data = last_exam_response.json() if last_exam_response.status_code == 200 else None
+    # Ces variables ne sont pas utilisées ailleurs dans le code
+except Exception as e:
+    # Si l'appel échoue, on continue simplement sans utiliser les données
+    pass
 
 # Configuration de la page
 st.set_page_config(page_title="Examen en cours", layout="wide")
