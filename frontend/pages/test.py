@@ -5,13 +5,25 @@ import requests
 from GazeTracking.gaze_tracking import GazeTracking
 from questions import QUESTIONS
 
-try:
-    last_exam_response = requests.get("http://localhost:8502/get_last_exam")
-    last_exam_data = last_exam_response.json() if last_exam_response.status_code == 200 else None
-except Exception as e:
-    pass
+API_URL = "http://backend:8000/get_last_exam"
 
-st.write(str(last_exam_response.json()))
+st.write("Dernier examen enregistré")
+
+try:
+    response = requests.get(API_URL)
+    response.raise_for_status()
+    data = response.json()
+
+    if data:
+        st.subheader("Détails de l'examen")
+        for key, value in data.items():
+            st.write(f"**{key}**: {value}")
+    else:
+        st.info("Aucun examen trouvé.")
+
+except requests.exceptions.RequestException as e:
+    st.error(f"Erreur lors de la requête : {e}")
+
 
 # --- Style personnalisé ---
 st.markdown(
