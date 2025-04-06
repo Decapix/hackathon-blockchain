@@ -28,7 +28,7 @@ const authAdapter = new AuthAdapter({
   },
   adapterSettings: {
     uxMode: UX_MODE.REDIRECT, // "redirect" | "popup"
-    redirectUrl: window.location.origin + "/menu",
+    redirectUrl: window.location.origin + "/",
   },
 });
 

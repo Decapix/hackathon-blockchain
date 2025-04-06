@@ -386,9 +386,9 @@ const ExamList: React.FC = () => {
                 ) : (
                   <>
                     <span style={{ marginRight: "10px", fontSize: "1.1rem" }}>
-                      🔗
+                      📝
                     </span>
-                    Start Blockchain Exam
+                    Start Exam
                   </>
                 )}
                 <span
@@ -397,9 +397,7 @@ const ExamList: React.FC = () => {
                     fontSize: "1.1rem"
                   } as React.CSSProperties}
                 >
-                  📝
                 </span>
-                Start Exam
               </button>
             </div>
           </form>
