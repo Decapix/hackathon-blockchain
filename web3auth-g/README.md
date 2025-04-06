@@ -1,41 +1,91 @@
-# Web3Auth (`@web3auth/modal`) x EVM x React - Playground
+# Web3Auth (React Application)
 
-[![Web3Auth](https://img.shields.io/badge/Web3Auth-SDK-blue)](https://web3auth.io/docs/sdk/pnp/web/modal)
-[![Web3Auth](https://img.shields.io/badge/Web3Auth-Community-cyan)](https://community.web3auth.io)
+This container provides the blockchain authentication and certification interface.
 
-[Join our Community Portal](https://community.web3auth.io/) to get support and stay up to date with the latest news and updates.
+## Features
 
-This example demonstrates how to use Web3Auth with EVM in React.
+- **Web3Auth Integration**: Secure blockchain wallet authentication
+- **Smart Contract Interaction**: Interact with the TestEvaluator contract
+- **Certificate Management**: View and verify blockchain certificates
+- **User Profile**: Display wallet and certification information
+- **SIWE (Sign-In With Ethereum)**: Cryptographically secure authentication
 
-## How to Use
+## Technology Stack
 
-### One-Click Deploy to Vercel
+- **React**: Frontend library for building the user interface
+- **TypeScript**: Type-safe JavaScript
+- **Vite**: Next generation frontend tooling
+- **Web3Auth**: Blockchain wallet authentication
+- **ethers.js**: Ethereum blockchain interaction
+- **Tailwind CSS**: Utility-first CSS framework
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FWeb3Auth%2Fweb3auth-pnp-examples%2Ftree%2Fmain%2Fweb-modal-sdk%2Freact-modal-playground&project-name=w3a-modal-playground&repository-name=w3a-modal-playground)
+## Architecture
 
-### Download Manually
+The application consists of several components:
 
-```bash
-npx degit Web3Auth/web3auth-pnp-examples/web-modal-sdk/react-modal-playground w3a-example
+- `App.tsx`: Main application component and routing
+- `components/`: UI components (buttons, forms, etc.)
+- `pages/`: Page components (HomePage, Certificate, etc.)
+- `services/`: Service functions for Web3Auth and blockchain interactions
+- `config/`: Configuration files for Web3Auth and smart contracts
+- `smartContract.sol`: TestEvaluator contract definition
+
+## Smart Contract
+
+The application interacts with the TestEvaluator smart contract which:
+- Manages exam sessions
+- Records exam results
+- Issues blockchain certificates
+- Verifies certification status
+
+## Docker Configuration
+
+The React application runs in a Docker container with:
+- Node.js 20 Alpine as the base image
+- Vite dev server on port 5173 (mapped to 8503)
+- Volume mounted app directory for development
+
+## Environment Variables
+
+The application uses the following environment variables:
+- `VITE_DEV_SERVER_HOST`: Host for the Vite dev server (0.0.0.0)
+- `VITE_DEV_SERVER_PORT`: Port for the Vite dev server (5173)
+
+## Usage
+
+The Web3Auth container will be started automatically with the `run.sh restart-project` command.
+
+Access the Web3Auth UI at: http://localhost:8503
+
+## Web3Auth Configuration
+
+The application uses Web3Auth for secure blockchain wallet authentication:
+- Multiple authentication options (social logins, email, etc.)
+- Customizable UI
+- Supports mainstream wallets and EIP-1193 compliant providers
+
+## Dependencies
+
+Key dependencies include:
+```json
+{
+  "@web3auth/auth-adapter": "^9.7.0",
+  "@web3auth/base": "^9.7.0",
+  "@web3auth/ethereum-provider": "^9.7.0",
+  "@web3auth/modal": "^9.7.0",
+  "@web3auth/modal-react-hooks": "^9.7.0",
+  "ethers": "^6.13.2",
+  "react": "^18.3.1",
+  "react-router-dom": "^6.26.2",
+  "siwe": "^3.0.0",
+  "web3": "^4.13.0"
+}
 ```
 
-Install & Run:
-
-```bash
-cd w3a-example
-npm install
-npm run start
-# or
-cd w3a-example
-yarn
-yarn start
-```
+See `package.json` for the complete list of dependencies.
 
 ## Important Links
 
-- [Website](https://web3auth.io)
-- [Docs](https://web3auth.io/docs)
-- [Guides](https://web3auth.io/docs/guides)
-- [SDK / API References](https://web3auth.io/docs/sdk)
-- [Pricing](https://web3auth.io/pricing.html)
-- [Community Portal](https://community.web3auth.io)
+- [Web3Auth Website](https://web3auth.io)
+- [Web3Auth Documentation](https://web3auth.io/docs)
+- [Web3Auth SDK References](https://web3auth.io/docs/sdk)
