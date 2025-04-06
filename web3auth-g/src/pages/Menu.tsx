@@ -55,10 +55,6 @@ const Menu: React.FC = () => {
   return (
     <div 
       style={{
-        backgroundImage: "url('/img.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
         backgroundColor: "rgba(85, 0, 50, 0.9)",
         minHeight: "100vh",
         display: "flex",

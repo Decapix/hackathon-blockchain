@@ -194,10 +194,6 @@ const ExamList: React.FC = () => {
   return (
     <div
       style={{
-        backgroundImage: "url('/img.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
         backgroundColor: "#ffffff",
         minHeight: "100vh",
         display: "flex",
@@ -333,7 +329,7 @@ const ExamList: React.FC = () => {
                   e.currentTarget.style.boxShadow = "0 0 15px rgba(22, 19, 21, 0.4)";
                 }}
                 onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.currentTarget.style.backgroundColor = "rgba(57, 54, 56, 0.2)";
+                  e.currentTarget.style.backgroundColor = "rgba(57, 54, 56, 0.3)";
                   e.currentTarget.style.boxShadow = "0 0 10px rgba(57, 54, 56, 0.2)";
                 }}
               >
