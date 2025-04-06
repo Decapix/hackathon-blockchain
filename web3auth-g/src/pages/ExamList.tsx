@@ -148,6 +148,11 @@ const ExamList: React.FC = () => {
 
         // Open Streamlit in a new tab
         window.open('http://localhost:8501/test', '_blank');
+        
+        // Redirection vers la page Menu après 1 seconde
+        setTimeout(() => {
+          navigate("/menu");
+        }, 1000);
       } catch (axiosError) {
         throw axiosError; // Rethrow to be caught by the outer catch
       }
