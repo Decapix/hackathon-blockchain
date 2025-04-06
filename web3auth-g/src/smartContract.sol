@@ -244,6 +244,98 @@ contract TestEvaluator {
     }
 
     /**
+     * @dev Enregistre un test complet avec toutes les données en une seule transaction
+     * @param emailHash Hash de l'email du candidat
+     * @param testId Identifiant unique du test
+     * @param consentSignature Signature de consentement
+     * @param consentTimestamp Timestamp du consentement
+     * @param startTime Timestamp de début du test
+     * @param endTime Timestamp de fin du test
+     * @param totalQuestions Nombre total de questions
+     * @param correctAnswers Nombre de réponses correctes
+     * @param fraudScore Score de fraude
+     * @param metadataURI URI des métadonnées
+     * @param siweMessage Message SIWE
+     */
+    function completeTestFull(
+        bytes32 emailHash,
+        bytes32 testId,
+        bytes calldata consentSignature,
+        uint64 consentTimestamp,
+        uint64 startTime,
+        uint64 endTime,
+        uint16 totalQuestions,
+        uint16 correctAnswers,
+        uint8 fraudScore,
+        string calldata metadataURI,
+        string calldata siweMessage
+    ) external {
+        // Vérifier que le testId est unique ou associé à cet utilisateur
+        require(testIdToAddress[testId] == address(0) || testIdToAddress[testId] == msg.sender, 
+                "Test ID already assigned to another user");
+        
+        // Calculer la durée
+        uint32 durationSeconds = uint32(endTime - startTime);
+        
+        // Calculer le score
+        uint16 score = _calculateScore(correctAnswers, totalQuestions);
+        
+        // Déterminer si le test est réussi
+        bool passed = (score >= 6000); // 60% pour réussir
+        
+        // Créer une nouvelle entrée de test complète
+        TestSession storage session = testSessions[msg.sender];
+        
+        // Identifiants
+        session.wallet = msg.sender;
+        session.emailHash = emailHash;
+        session.testId = testId;
+        
+        // Consentement
+        session.consentSignature = consentSignature;
+        session.consentTimestamp = consentTimestamp;
+        
+        // Temps
+        session.startTime = startTime;
+        session.endTime = endTime;
+        session.durationSeconds = durationSeconds;
+        
+        // Résultats
+        session.totalQuestions = totalQuestions;
+        session.correctAnswers = correctAnswers;
+        session.score = score;
+        session.passed = passed;
+        
+        // Statut et métadonnées
+        session.status = TestStatus.Completed;
+        session.fraudScore = fraudScore;
+        session.metadataURI = metadataURI;
+        
+        // SIWE
+        session.siweMessage = siweMessage;
+        session.siweSignature = consentSignature;
+        
+        // Associations pour faciliter les recherches
+        testIdToAddress[testId] = msg.sender;
+        
+        // Ajouter ce test à l'historique de l'utilisateur si c'est un nouveau test
+        if (testIdToAddress[testId] == address(0)) {
+            userTestHistory[msg.sender].push(testId);
+        }
+        
+        // Émettre l'événement
+        emit TestCompleted(
+            msg.sender,
+            testId,
+            score,
+            passed,
+            startTime,
+            endTime,
+            durationSeconds
+        );
+    }
+    
+    /**
      * @dev Calcule le score en pourcentage (0-10000 pour 0-100%)
      * @param correct Nombre de réponses correctes
      * @param total Nombre total de questions
