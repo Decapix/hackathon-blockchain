@@ -25,8 +25,8 @@ if not st.session_state.timer_started:
     <div style="display: flex; justify-content: center; margin-top: 50px;">
         <div style="position: relative; width: 200px; height: 200px;">
             <svg width="200" height="200" viewBox="0 0 200 200">
-                <circle cx="100" cy="100" r="90" fill="none" stroke="#333333" stroke-width="10"/>
-                <circle cx="100" cy="100" r="90" fill="none" stroke="#39FF14" stroke-width="10"
+                <circle cx="100" cy="100" r="90" fill="none" stroke="#f0f0f0" stroke-width="10"/>
+                <circle cx="100" cy="100" r="90" fill="none" stroke="#a80464" stroke-width="10"
                     stroke-dasharray="565.48" 
                     stroke-dashoffset="0"
                     transform="rotate(-90, 100, 100)"
@@ -41,7 +41,7 @@ if not st.session_state.timer_started:
                 </circle>
             </svg>
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                       font-size: 70px; color: #39FF14; font-weight: bold;">
+                       font-size: 70px; color: #a80464; font-weight: bold;">
                 3
             </div>
         </div>
@@ -60,8 +60,8 @@ if not st.session_state.timer_started:
     for seconds_left in range(3, 0, -1):
         if seconds_left < 3:  # Update only the number for seconds 2 and 1
             timer_placeholder.markdown(
-                svg_code.replace(f'font-size: 70px; color: #39FF14; font-weight: bold;">\n                3', 
-                                f'font-size: 70px; color: #39FF14; font-weight: bold;">\n                {seconds_left}'),
+                svg_code.replace(f'font-size: 70px; color: #a80464; font-weight: bold;">\n                3', 
+                                f'font-size: 70px; color: #a80464; font-weight: bold;">\n                {seconds_left}'),
                 unsafe_allow_html=True
             )
         time.sleep(1)
@@ -91,63 +91,82 @@ except requests.exceptions.RequestException as e:
 st.markdown(
     """
     <style>
+    /* Fond clair global */
+    body {
+        background-color: #ffffff;
+        color: #333333;
+        font-family: 'Arial', sans-serif;
+    }
+
     /* Dégradé du titre */
     .title-gradient {
-        background: linear-gradient(45deg, #ff6ec4, #f83600);
+        background: linear-gradient(45deg, #a80464, #a80464);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 3em;
+        font-size: 2.5em;
         font-weight: bold;
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     /* Style du bouton Valider */
     .stButton > button {
-        background-color: #00cc66;
+        background: linear-gradient(45deg, #a80464, #a80464);
         color: white;
         font-weight: bold;
         font-size: 1.1em;
         padding: 0.75em 2em;
         border: none;
-        border-radius: 10px;
-        transition: 0.2s ease-in-out;
-        display: inline-block;  /* Remplace float: right */
+        border-radius: 30px;
+        transition: all 0.3s ease;
     }
 
     .stButton > button:hover {
-        background-color: #00994d;
-        color: white;
-    }
-
-    /* Thème général */
-    body {
-        background-color: #0d0d0d;
-        color: #39FF14;
-        font-family: 'Courier New', Courier, monospace;
+        background: linear-gradient(45deg, #a80464, #a80464);
+        box-shadow: 0 5px 15px rgba(168, 4, 100, 0.4);
+        transform: translateY(-2px);
     }
 
     /* Radios */
     .stRadio label {
-        color: #39FF14;
-        font-weight: bold;
-        font-size: 1.5em;  /* Augmenter la taille de la police */
+        color: #333;
+        font-size: 1.1em;
+        padding: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .stRadio label:hover {
+        background-color: #f8f9fa;
+        border-radius: 8px;
     }
 
     /* Barre de progression en rose */
     .progress-container {
-        background-color: #ffffff;
+        background-color: #f0f0f0;
         width: 100%;
         height: 10px;
-        border-radius: 5px;
-        margin-top: 1em;
+        border-radius: 10px;
+        margin: 1.5em 0;
+        overflow: hidden;
     }
 
     .progress-bar {
-        background-color: #ffb200;
+        background: linear-gradient(90deg, #a80464, #a80464);
         height: 100%;
-        border-radius: 5px;
+        border-radius: 10px;
         transition: width 0.5s ease-in-out;
+        box-shadow: 0 2px 5px rgba(168, 4, 100, 0.3);
+    }
+
+    /* Question header */
+    .question-header {
+        background-color: #f8f9fa;
+        border-left: 4px solid #a80464;
+        padding: 10px 15px;
+        margin: 15px 0;
+        border-radius: 5px;
+        font-size: 1.2em;
+        color: #333;
     }
     </style>
     """,
@@ -172,11 +191,14 @@ if 'selected_exam' not in st.session_state:
 exam = st.session_state.selected_exam
 total_questions = len(QUESTIONS[exam])
 
-# --- Barre de progression flashy ---
+# --- Barre de progression stylisée ---
 progress_percent = int((st.session_state.question_index / len(QUESTIONS[st.session_state.selected_exam])) * 100)
 st.markdown(f"""
 <div class="progress-container">
     <div class="progress-bar" style="width:{progress_percent}%"></div>
+</div>
+<div style="text-align: right; font-size: 0.9em; color: #666; margin-bottom: 20px;">
+    Question {st.session_state.question_index + 1} sur {total_questions}
 </div>
 """, unsafe_allow_html=True)
 
@@ -184,7 +206,14 @@ st.markdown(f"""
 # --- Affichage des questions ---
 if st.session_state.question_index < total_questions:
     q = QUESTIONS[exam][st.session_state.question_index]
-    st.header(f"Question {st.session_state.question_index + 1}")
+    
+    # Titre de la question avec style
+    st.markdown(f"""
+    <div class="question-header">
+        <strong>Question {st.session_state.question_index + 1}:</strong> {q.get("text", "Répondez à la question suivante :")}
+    </div>
+    """, unsafe_allow_html=True)
+    
     choice = st.radio("", q["options"], key=f"question_{st.session_state.question_index}")
 
     # Bouton aligné à droite
@@ -232,34 +261,26 @@ else:
             to { transform: translateY(0); opacity: 1; }
         }
         
-        @keyframes shine {
-            0% { background-position: -100px; }
-            100% { background-position: 300px; }
-        }
-        
         .success-container {
-            background-color: #1e1e1e;
-            border-radius: 10px;
+            background-color: #f8f9fa;
+            border-radius: 15px;
             padding: 30px;
             margin-top: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             animation: fadeIn 1s ease-out;
-            border: 1px solid #39FF14;
         }
         
         .success-title {
-            font-family: 'Courier New', monospace;
-            color: #39FF14;
+            color: #a80464;
             text-align: center;
             font-size: 2.5em;
+            font-weight: bold;
             margin-bottom: 15px;
             animation: slideUp 1s ease-out;
-            text-shadow: 0 0 10px rgba(57, 255, 20, 0.7);
         }
         
         .success-subtitle {
-            font-family: 'Courier New', monospace;
-            color: white;
+            color: #555;
             text-align: center;
             font-size: 1.5em;
             margin-bottom: 25px;
@@ -267,93 +288,12 @@ else:
         }
         
         .score-display {
-            font-family: 'Courier New', monospace;
-            color: #39FF14;
+            color: #a80464;
             text-align: center;
             font-size: 3em;
             font-weight: bold;
             margin: 20px 0;
             animation: slideUp 1.4s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .score-display::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.4), transparent);
-            animation: shine 2s infinite;
-        }
-        
-        .certificate {
-            background-color: #f8f8f8;
-            border-radius: 8px;
-            padding: 20px;
-            width: 80%;
-            max-width: 600px;
-            margin: 20px auto;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            position: relative;
-            animation: slideUp 1.6s ease-out;
-            color: #333;
-            text-align: center;
-        }
-        
-        .certificate::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.05"><path d="M0,0 L100,100 M100,0 L0,100" stroke="black" stroke-width="1"/></svg>');
-            z-index: 0;
-            border-radius: 8px;
-        }
-        
-        .certificate h3 {
-            font-family: 'Times New Roman', serif;
-            font-size: 1.8em;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .certificate p {
-            font-family: 'Times New Roman', serif;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .seal {
-            width: 80px;
-            height: 80px;
-            margin: 15px auto;
-            border-radius: 50%;
-            background: radial-gradient(circle, #ffec99, #ffcc00);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .seal::after {
-            content: '✓';
-            font-size: 40px;
-            color: #333;
-        }
-        
-        .date {
-            font-style: italic;
-            margin-top: 15px;
-            position: relative;
-            z-index: 1;
         }
         </style>
         """
@@ -367,9 +307,9 @@ else:
         <div class="success-container">
             <h1 class="success-title">Congratulations !</h1>
             <h2 class="success-subtitle">You have passed the exam.</h2>
-            <h3 class="score-display-failure">Your score : {score / total_questions * 100:.2f}%</h3>
-            <h3 class="score-display-cheating">Our fraud detection detected a 
-            {cheat_percentage*100}% chance of cheating, you are therefore eligible.</h3>
+            <h3 class="score-display">Your score : {score / total_questions * 100:.2f}%</h3>
+            <p style="text-align: center; color: #666;">Our fraud detection detected a 
+            {cheat_percentage*100:.1f}% chance of cheating, you are therefore eligible.</p>
         </div>
         """
         
@@ -387,35 +327,26 @@ else:
             to { transform: translateY(0); opacity: 1; }
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1); }
-        }
-        
         .failure-container {
-            background-color: #1e1e1e;
-            border-radius: 10px;
+            background-color: #f8f9fa;
+            border-radius: 15px;
             padding: 30px;
             margin-top: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             animation: fadeIn 1s ease-out;
-            border: 1px solid #ff3333;
         }
         
         .failure-title {
-            font-family: 'Courier New', monospace;
-            color: #ff3333;
+            color: #a80464;
             text-align: center;
             font-size: 2.2em;
+            font-weight: bold;
             margin-bottom: 15px;
             animation: slideUp 1s ease-out;
-            text-shadow: 0 0 10px rgba(255, 51, 51, 0.7);
         }
         
         .failure-subtitle {
-            font-family: 'Courier New', monospace;
-            color: white;
+            color: #555;
             text-align: center;
             font-size: 1.4em;
             margin-bottom: 25px;
@@ -423,99 +354,12 @@ else:
         }
         
         .score-display-failure {
-            font-family: 'Courier New', monospace;
-            color: #ff3333;
+            color: #a80464;
             text-align: center;
             font-size: 3em;
             font-weight: bold;
             margin: 20px 0;
             animation: slideUp 1.4s ease-out;
-            position: relative;
-        }
-        
-        .retry-message {
-            background-color: #2a2a2a;
-            border-radius: 8px;
-            padding: 20px;
-            width: 80%;
-            max-width: 600px;
-            margin: 20px auto;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            position: relative;
-            animation: slideUp 1.6s ease-out, pulse 2s infinite ease-in-out;
-            color: white;
-            text-align: center;
-            border-left: 4px solid #ff3333;
-        }
-        
-        .retry-message h3 {
-            font-family: 'Courier New', monospace;
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-            color: #ffc107;
-        }
-        
-        .retry-message p {
-            font-family: 'Courier New', monospace;
-            position: relative;
-            z-index: 1;
-            margin-bottom: 0.8em;
-        }
-        
-        .feedback-list {
-            text-align: left;
-            width: 80%;
-            margin: 20px auto;
-            padding: 15px;
-            background-color: #252525;
-            border-radius: 8px;
-            animation: slideUp 1.8s ease-out;
-        }
-        
-        .feedback-list h4 {
-            font-family: 'Courier New', monospace;
-            color: white;
-            margin-bottom: 10px;
-        }
-        
-        .feedback-list ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        
-        .feedback-list li {
-            padding: 8px 0;
-            border-bottom: 1px solid #333;
-            font-family: 'Courier New', monospace;
-            color: #cccccc;
-        }
-        
-        .feedback-list li::before {
-            content: '> ';
-            color: #ff3333;
-            font-weight: bold;
-        }
-        
-        .terminal-button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #ff3333;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            text-decoration: none;
-            animation: slideUp 2s ease-out;
-            transition: background-color 0.3s ease;
-        }
-        
-        .terminal-button:hover {
-            background-color: #ff6666;
-            cursor: pointer;
         }
         </style>
         """
@@ -527,12 +371,12 @@ else:
             failure_subtitle = f"""
             We detected a too high chance of cheating."""
             fraud_message = f"""
-            Our fraud detection detected a {cheat_percentage*100}% chance of cheating, 
+            Our fraud detection detected a {cheat_percentage*100:.1f}% chance of cheating, 
             you are therefore not eligible."""
         else:
             failure_subtitle = f"""You have not reached the minimum score required."""
             fraud_message = f"""
-            Our fraud detection detected a {cheat_percentage*100}% chance of cheating."""
+            Our fraud detection detected a {cheat_percentage*100:.1f}% chance of cheating."""
 
         # HTML à afficher en cas d'échec
         failure_html = f"""
@@ -541,7 +385,7 @@ else:
             <h1 class="failure-title">Exam not validated</h1>
             <h2 class="failure-subtitle">{failure_subtitle}</h2>
             <h3 class="score-display-failure">Your score : {score_percent:.2f}%</h3>
-            <h3 class="score-display-cheating">{fraud_message}</h3>
+            <p style="text-align: center; color: #666;">{fraud_message}</p>
         </div>
         """
 
@@ -570,13 +414,20 @@ if start_webcam:
         gaze.refresh(frame)
         new_frame = gaze.annotated_frame()
 
-        text = "Looking center"
+        # Détection du regard avec style plus moderne
         if gaze.is_right() or gaze.is_left():
-            text = "CHEATING!!!"
+            text = "⚠️ ATTENTION !"
+            text_color = (168, 4, 100)  # Pink color (a80464 in BGR format)
             if st.session_state.question_index not in st.session_state.cheated_questions:
                 st.session_state.cheated_questions.add(st.session_state.question_index)
+        else:
+            text = "👍 Regard centré"
+            text_color = (50, 205, 50)  # Green
 
-        cv2.putText(new_frame, text, (60, 60), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2)
+        # Texte plus professionnel et stylisé
+        cv2.rectangle(new_frame, (30, 25), (290, 70), (255, 255, 255), -1)
+        cv2.putText(new_frame, text, (40, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+        
         frame = cv2.cvtColor(new_frame, cv2.COLOR_BGR2RGB)
         frame_placeholder.image(frame)
         time.sleep(0.03)

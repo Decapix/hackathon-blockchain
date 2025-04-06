@@ -35,7 +35,6 @@ const authAdapter = new AuthAdapter({
 const walletServicesPlugin = new WalletServicesPlugin({
   wsEmbedOpts: {},
   walletInitOptions: {
-    whiteLabel: { showWidgetButton: false },
     whiteLabel: { showWidgetButton: false }, // Désactivation du bouton de widget
     confirmationStrategy: CONFIRMATION_STRATEGY.MODAL,
   },

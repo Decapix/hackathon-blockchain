@@ -18,7 +18,6 @@ const ExamList: React.FC = () => {
   const [success, setSuccess] = useState<string>("");
   const navigate = useNavigate();
   const { getUserInfo } = usePlayground();
-  const { provider, uiConsole } = usePlayground();
 
   useEffect(() => {
     // Load the exam data from question.json
@@ -199,13 +198,13 @@ const ExamList: React.FC = () => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        backgroundColor: "#121212",
+        backgroundColor: "#ffffff",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        color: "#e0e0e0",
+        color: "#333333",
         padding: "20px"
       } as React.CSSProperties}
     >
@@ -213,9 +212,10 @@ const ExamList: React.FC = () => {
         style={{
           maxWidth: "800px",
           width: "100%",
-          background: "linear-gradient(145deg, #1e1e1e, #2d2d2d)",
+          background: "#ffffff",
           borderRadius: "15px",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.5)",
+          boxShadow: "0 8px 32px rgba(168, 4, 100, 0.3)",
+          border: "1px solid rgba(168, 4, 100, 0.2)",
           padding: "40px",
           textAlign: "center"
         } as React.CSSProperties}
@@ -223,12 +223,12 @@ const ExamList: React.FC = () => {
         <h1
           style={{
             marginBottom: "20px",
-            color: "#6a98f0",
+            color: "#a80464",
             fontSize: "2.5rem",
             fontWeight: "700"
           } as React.CSSProperties}
         >
-          List of <span style={{ color: "#00c3ff" }}>Exams</span>
+          List of <span style={{ color: "#a80464" }}>Exams</span>
         </h1>
 
         {userEmail && (
@@ -236,13 +236,13 @@ const ExamList: React.FC = () => {
             style={{
               marginBottom: "20px",
               padding: "8px 15px",
-              backgroundColor: "rgba(0, 195, 255, 0.1)",
+              backgroundColor: "rgba(168, 4, 100, 0.1)",
               borderRadius: "6px",
-              border: "1px solid rgba(0, 195, 255, 0.3)",
+              border: "1px solid rgba(168, 4, 100, 0.3)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#e0e0e0"
+              color: "#333333"
             } as React.CSSProperties}
           >
             <span style={{ fontSize: "1.1rem", marginRight: "10px" }}>👤</span>
@@ -254,7 +254,7 @@ const ExamList: React.FC = () => {
           style={{
             marginBottom: "30px",
             padding: "20px",
-            background: "rgba(255, 255, 255, 0.05)",
+            background: "#f8f9fa",
             borderRadius: "10px"
           } as React.CSSProperties}
         >
@@ -274,7 +274,7 @@ const ExamList: React.FC = () => {
                 style={{
                   display: "block",
                   marginBottom: "10px",
-                  color: "#00c3ff",
+                  color: "#a80464",
                   fontWeight: "600"
                 } as React.CSSProperties}
               >
@@ -287,18 +287,18 @@ const ExamList: React.FC = () => {
                 style={{
                   width: "100%",
                   padding: "12px",
-                  backgroundColor: "rgba(0, 0, 0, 0.3)",
-                  color: "#e0e0e0",
-                  border: "1px solid rgba(106, 152, 240, 0.3)",
+                  backgroundColor: "#f8f9fa",
+                  color: "#333333",
+                  border: "1px solid rgba(168, 4, 100, 0.3)",
                   borderRadius: "8px",
                   fontSize: "1rem",
                   outline: "none",
                   transition: "all 0.3s ease"
                 } as React.CSSProperties}
               >
-                <option value="" style={{ backgroundColor: "#1e1e1e" }}>-- Choose an exam --</option>
+                <option value="" style={{ backgroundColor: "#f8f9fa" }}>-- Choose an exam --</option>
                 {exams.map((exam, index) => (
-                  <option key={index} value={exam} style={{ backgroundColor: "#1e1e1e" }}>
+                  <option key={index} value={exam} style={{ backgroundColor: "#f8f9fa" }}>
                     {exam}
                   </option>
                 ))}
@@ -320,18 +320,21 @@ const ExamList: React.FC = () => {
                   padding: "12px 20px",
                   fontSize: "1rem",
                   fontWeight: "600",
-                  backgroundColor: "#2a2d3e",
-                  color: "#e0e0e0",
-                  border: "none",
+                  backgroundColor: "rgba(57, 54, 56, 0.3)",
+                  color: "#ffffff",
+                  border: "1px solid rgba(57, 54, 56, 0.3)",
                   borderRadius: "8px",
                   cursor: "pointer",
-                  transition: "all 0.3s ease"
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 0 10px rgba(168, 4, 100, 0.2)"
                 } as React.CSSProperties}
                 onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.currentTarget.style.backgroundColor = "#3a3f55";
+                  e.currentTarget.style.backgroundColor = "rgba(57, 54, 56, 0.4)";
+                  e.currentTarget.style.boxShadow = "0 0 15px rgba(22, 19, 21, 0.4)";
                 }}
                 onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.currentTarget.style.backgroundColor = "#2a2d3e";
+                  e.currentTarget.style.backgroundColor = "rgba(57, 54, 56, 0.2)";
+                  e.currentTarget.style.boxShadow = "0 0 10px rgba(57, 54, 56, 0.2)";
                 }}
               >
                 Back
@@ -344,30 +347,30 @@ const ExamList: React.FC = () => {
                   padding: "12px 20px",
                   fontSize: "1rem",
                   fontWeight: "600",
-                  backgroundColor: (selectedExam && !loading) ? "#00c3ff" : "#2a2d3e",
+                  backgroundColor: selectedExam ? "#a80464" : "rgba(168, 4, 100, 0.2)",
                   color: "#ffffff",
-                  border: "none",
+                  border: selectedExam ? "1px solid rgba(168, 4, 100, 0.7)" : "1px solid rgba(168, 4, 100, 0.3)",
                   borderRadius: "8px",
-                  cursor: (selectedExam && !loading) ? "pointer" : "not-allowed",
+                  cursor: selectedExam ? "pointer" : "not-allowed",
                   transition: "all 0.3s ease",
-                  boxShadow: (selectedExam && !loading) ? "0 0 10px rgba(0, 195, 255, 0.4)" : "none",
-                  opacity: (selectedExam && !loading) ? "1" : "0.6",
+                  boxShadow: selectedExam ? "0 0 10px rgba(168, 4, 100, 0.4)" : "none",
+                  opacity: selectedExam ? "1" : "0.6",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center"
                 } as React.CSSProperties}
                 onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
                   if(selectedExam && !loading) {
-                    e.currentTarget.style.backgroundColor = "#33ceff";
+                    e.currentTarget.style.backgroundColor = "#c20579";
                     e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 0 15px rgba(0, 195, 255, 0.5)";
+                    e.currentTarget.style.boxShadow = "0 0 15px rgba(168, 4, 100, 0.5)";
                   }
                 }}
                 onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
                   if(selectedExam && !loading) {
-                    e.currentTarget.style.backgroundColor = "#00c3ff";
+                    e.currentTarget.style.backgroundColor = "#a80464";
                     e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "0 0 10px rgba(0, 195, 255, 0.4)";
+                    e.currentTarget.style.boxShadow = "0 0 10px rgba(168, 4, 100, 0.4)";
                   }
                 }}
               >
@@ -391,13 +394,6 @@ const ExamList: React.FC = () => {
                     Start Exam
                   </>
                 )}
-                <span
-                  style={{
-                    marginRight: "10px",
-                    fontSize: "1.1rem"
-                  } as React.CSSProperties}
-                >
-                </span>
               </button>
             </div>
           </form>

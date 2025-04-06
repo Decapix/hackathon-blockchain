@@ -201,13 +201,13 @@ const Certifications: React.FC = () => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        backgroundColor: "#121212",
+        backgroundColor: "#ffffff",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        color: "#e0e0e0",
+        color: "#333333",
         padding: "20px"
       } as React.CSSProperties}
     >
@@ -215,9 +215,10 @@ const Certifications: React.FC = () => {
         style={{
           maxWidth: "800px",
           width: "100%",
-          background: "linear-gradient(145deg, #1e1e1e, #2d2d2d)",
+          background: "#ffffff",
           borderRadius: "15px",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.5)",
+          boxShadow: "0 8px 32px rgba(168, 4, 100, 0.3)",
+          border: "1px solid rgba(168, 4, 100, 0.2)",
           padding: "40px",
           textAlign: "center"
         } as React.CSSProperties}
@@ -225,19 +226,19 @@ const Certifications: React.FC = () => {
         <h1 
           style={{ 
             marginBottom: "40px", 
-            color: "#6a98f0",
+            color: "#a80464",
             fontSize: "2.5rem",
             fontWeight: "700"
           } as React.CSSProperties}
         >
-          Your <span style={{ color: "#00c3ff" }}>Certifications</span>
+          Your <span style={{ color: "#a80464" }}>Certifications</span>
         </h1>
         
         <div
           style={{
             marginBottom: "30px",
             padding: "20px",
-            background: "rgba(255, 255, 255, 0.05)",
+            background: "#f8f9fa",
             borderRadius: "10px"
           } as React.CSSProperties}
         >
@@ -250,7 +251,7 @@ const Certifications: React.FC = () => {
               <p>Loading your certifications...</p>
             </div>
           ) : error ? (
-            <div style={{ textAlign: 'center', padding: '20px', color: '#ff6b6b' }}>
+            <div style={{ textAlign: 'center', padding: '20px', color: '#a80464' }}>
               <p>{error}</p>
             </div>
           ) : certifications.length === 0 ? (
@@ -275,29 +276,40 @@ const Certifications: React.FC = () => {
                     alignItems: "center",
                     padding: "15px",
                     borderRadius: "8px",
-                    background: "rgba(106, 152, 240, 0.1)",
-                    border: "1px solid rgba(106, 152, 240, 0.3)"
+                    background: "rgba(168, 4, 100, 0.1)",
+                    border: "1px solid rgba(168, 4, 100, 0.3)"
                   } as React.CSSProperties}
                 >
-                  <div style={{ textAlign: "left" }}>
-                    <h3 style={{ margin: "0", color: "#00c3ff" }}>{cert.exam_id}</h3>
-                    <p style={{ margin: "5px 0 0", fontSize: "0.9rem", opacity: "0.7" }}>
-                      Issued on {formatDate(cert.timestamp)}
-                    </p>
-                  </div>
-                  <div
-                    style={{
-                      backgroundColor: "#00c3ff20",
-                      color: "#00c3ff",
-                      padding: "5px 10px",
-                      borderRadius: "5px",
-                      fontSize: "0.8rem",
-                      fontWeight: "bold"
-                    } as React.CSSProperties}
-                  >
-                    Vérifié
-                  </div>
+                <div style={{ textAlign: "left" }}>
+                  <h3 style={{ margin: "0", color: "#a80464" }}>{cert.exam_id}</h3>
+                  <p style={{ margin: "5px 0 0", fontSize: "0.9rem", opacity: "0.7" }}>
+                    Issued on {formatDate(cert.timestamp)}
+                  </p>
                 </div>
+                <div
+                  style={{
+                    backgroundColor: "rgba(168, 4, 100, 0.13)",
+                    color: "#a80464",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    fontSize: "0.8rem",
+                    fontWeight: "bold"
+                  } as React.CSSProperties}
+                >
+                Verified
+                </div>
+                <div
+                  style={{
+                    backgroundColor: "white",
+                    padding: "5px",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleQRCodeClick(cert.exam_id)}
+                >
+                <QRCode value="https://example.com" size={50} />
+                </div>
+              </div>
               ))}
             </div>
           )}
@@ -309,19 +321,22 @@ const Certifications: React.FC = () => {
             padding: "12px 20px",
             fontSize: "1rem",
             fontWeight: "600",
-            backgroundColor: "#2a2d3e",
-            color: "#e0e0e0",
-            border: "none",
+            backgroundColor: "rgba(168, 4, 100, 1)",
+            color: "#ffffff",
+            border: "1px solid rgba(168, 4, 100, 0.5)",
             borderRadius: "8px",
             cursor: "pointer",
             transition: "all 0.3s ease",
-            marginTop: "20px"
+            marginTop: "20px",
+            boxShadow: "0 0 10px rgba(168, 4, 100, 0.2)"
           } as React.CSSProperties}
           onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-            e.currentTarget.style.backgroundColor = "#3a3f55";
+            e.currentTarget.style.backgroundColor = "rgba(168, 4, 100, 1)";
+            e.currentTarget.style.boxShadow = "0 0 15px rgba(168, 4, 100, 1)";
           }}
           onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-            e.currentTarget.style.backgroundColor = "#2a2d3e";
+            e.currentTarget.style.backgroundColor = "rgba(168, 4, 100, 1)";
+            e.currentTarget.style.boxShadow = "0 0 10px rgba(168, 4, 100, 0.2)";
           }}
         >
           Back to Menu
@@ -373,7 +388,7 @@ const Certifications: React.FC = () => {
               backgroundColor: "white",
               padding: "20px",
               borderRadius: "10px",
-              boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
+              boxShadow: "0 0 20px rgba(168, 4, 100, 0.5)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -389,7 +404,7 @@ const Certifications: React.FC = () => {
               onClick={closeZoomedQR}
               style={{
                 padding: "10px 20px",
-                backgroundColor: "#6a98f0",
+                backgroundColor: "#a80464",
                 color: "white",
                 border: "none",
                 borderRadius: "5px",
