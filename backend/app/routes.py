@@ -12,13 +12,13 @@ ExamTable = db.table('exam')
 
 class ExamSession(BaseModel):
     email: str
-    exam_id: int
+    exam_id: str
     timestamp: int
     session_id: str
 
 class ExamResultRequest(BaseModel):
     email: str
-    exam_id: int
+    exam_id: str
     score: int
     cheat_score: float
     passed: bool
@@ -26,7 +26,7 @@ class ExamResultRequest(BaseModel):
 
 class ExamInitRequest(BaseModel):
     email: str
-    exam_id: int
+    exam_id: str
 
 @router.post("/init_exam")
 def init_exam(request: ExamInitRequest):
@@ -58,7 +58,7 @@ def get_last_exam(email: str):
     return last_exam[0]
 
 @router.get("/get_result")
-def get_result(email: str, exam_id: int):
+def get_result(email: str, exam_id: str):
     Exam = Query()
     result = ExamTable.search((Exam.email == email) & (Exam.exam_id == exam_id))
     if not result:

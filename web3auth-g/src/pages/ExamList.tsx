@@ -102,7 +102,7 @@ const ExamList: React.FC = () => {
       // Make API call to backend to start the exam
       const requestData = {
         email: userEmail,
-        exam_id: parseInt(selectedExam)
+        exam_id: selectedExam
       };
       console.log('Calling backend API with data:', requestData);
 
