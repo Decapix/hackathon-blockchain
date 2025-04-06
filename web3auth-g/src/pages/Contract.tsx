@@ -471,16 +471,23 @@ function Contract() {
                                 fraudScore: validatedFraudScore
                               });
                               
-                              // Nouvelle méthode basée sur l'ABI mis à jour
-                              const tx = await contract.completeTest(
-                                correctAnswers,
-                                validatedFraudScore,
-                                metadataURI,
-                                BigInt(endTime), // Passez endTimeOverride comme 4ème argument
+                              // Utiliser completeTestFull pour enregistrer toutes les données en une fois
+                              const tx = await contract.completeTestFull(
+                                emailHash,                                  // emailHash
+                                testId,                                     // testId
+                                consentSignature,                           // consentSignature
+                                BigInt(consentTimestamp),                   // consentTimestamp
+                                BigInt(startTime),                          // startTime
+                                BigInt(endTime),                            // endTime
+                                totalQuestions,                             // totalQuestions
+                                correctAnswers,                             // correctAnswers
+                                validatedFraudScore,                        // fraudScore
+                                metadataURI,                                // metadataURI
+                                siweMessage || "SIWE Authentication",       // siweMessage
                                 {
                                   nonce: finalNonce,
-                                  gasLimit: 250_000,
-                                  gasPrice: ethers.parseUnits("20", "gwei"), // Utiliser gasPrice directement
+                                  gasLimit: 100_000,                        // Valeur raisonnable selon l'usage réel
+                                  gasPrice: ethers.parseUnits("5", "gwei")  // Valeur raisonnable
                                 }
                               );
                               console.log("🔄 Transaction étendue envoyée avec le hash:", tx.hash);
@@ -492,27 +499,81 @@ function Contract() {
                               const newNonce = await ethersProvider.getTransactionCount(userAddress, "latest");
                               console.log("🔢 Nouveau nonce pour la version simple:", newNonce);
                               
-                              // S'assurer que les types sont corrects
-                              const safeCorrectAnswers = Math.min(correctAnswers, totalQuestions);
-                              const safeFraudScore = Math.min(Math.max(fraudScore || 0, 0), 100);
-                              
-                              // Timestamp de fin (0 = utiliser block.timestamp)
-                              const endTimeSeconds = Math.floor(Date.now() / 1000);
-                              
-                              // Fallback vers la version simple completeTest avec 4 paramètres
-                              const tx = await contract.completeTest(
-                                safeCorrectAnswers, 
-                                safeFraudScore, 
-                                metadataURI, 
-                                BigInt(endTimeSeconds), // Timestamp de fin explicite
-                                {
-                                  nonce: newNonce, // Utiliser le nonce le plus récent 
-                                  gasLimit: 150_000,
-                                  gasPrice: ethers.parseUnits("25", "gwei"), // Utiliser uniquement gasPrice
-                                }
-                              );
-                              console.log("🔄 Transaction simple envoyée avec le hash:", tx.hash);
-                              await tx.wait();
+                              // Essai avec completeTestFull même en cas d'échec de la première tentative
+                              try {
+                                // Re-création des paramètres pour être sûr
+                                const newEmailHash = ethers.solidityPackedKeccak256(
+                                  ["string", "address"], 
+                                  ["utilisateur@exemple.com", userAddress]
+                                );
+                                const newTestId = ethers.solidityPackedKeccak256(
+                                  ["address", "uint256"], 
+                                  [userAddress, Math.floor(Date.now() / 1000)]
+                                );
+                                
+                                // Sécuriser les valeurs numériques
+                                const safeCorrectAnswers = Math.min(correctAnswers, totalQuestions);
+                                const safeFraudScore = Math.min(Math.max(fraudScore || 0, 0), 100);
+                                
+                                // Timestamps précis
+                                const nowExact = Math.floor(Date.now() / 1000);
+                                const safeStartTime = testStartTime 
+                                  ? Math.floor(testStartTime / 1000) 
+                                  : nowExact - 300; // 5 minutes avant
+                                
+                                console.log("🔄 Nouvelle tentative avec completeTestFull");
+                                
+                                // Essai avec completeTestFull même en fallback
+                                const tx = await contract.completeTestFull(
+                                  newEmailHash,
+                                  newTestId,
+                                  ethers.toUtf8Bytes("ConsentementFallback"),
+                                  BigInt(safeStartTime - 60),    // consentTimestamp juste avant le début
+                                  BigInt(safeStartTime),         // startTime
+                                  BigInt(nowExact),              // endTime
+                                  totalQuestions,
+                                  safeCorrectAnswers,
+                                  safeFraudScore,
+                                  metadataURI,
+                                  "SIWE Authentication Fallback",
+                                  {
+                                    nonce: newNonce,
+                                    gasLimit: 100_000,            // Valeur raisonnable
+                                    gasPrice: ethers.parseUnits("5.5", "gwei")  // Légèrement plus élevé pour le fallback
+                                  }
+                                );
+                                
+                                console.log("🔄 Transaction fallback complète envoyée avec le hash:", tx.hash);
+                                await tx.wait();
+                              } catch (fallbackError) {
+                                console.error("❌❌ Échec de la tentative avec completeTestFull:", fallbackError.message);
+                                
+                                // Dernier recours : version simple avec completeTest
+                                console.log("⚠️ Recours à la méthode simple completeTest");
+                                
+                                // Sécuriser les valeurs numériques
+                                const safeCorrectAnswers = Math.min(correctAnswers, totalQuestions);
+                                const safeFraudScore = Math.min(Math.max(fraudScore || 0, 0), 100);
+                                const endTimeSeconds = Math.floor(Date.now() / 1000);
+                                
+                                // Récupérer un nonce vraiment frais
+                                const finalNonce = await ethersProvider.getTransactionCount(userAddress, "latest");
+                                
+                                // Fallback vers la version simple completeTest avec 4 paramètres
+                                const tx = await contract.completeTest(
+                                  safeCorrectAnswers, 
+                                  safeFraudScore, 
+                                  metadataURI, 
+                                  BigInt(endTimeSeconds), // Timestamp de fin explicite
+                                  {
+                                    nonce: finalNonce, 
+                                    gasLimit: 75_000,              // Valeur encore plus basse pour cette fonction simple
+                                    gasPrice: ethers.parseUnits("6", "gwei")  // Légèrement plus élevé pour assurer le passage
+                                  }
+                                );
+                                console.log("🔄 Transaction simple envoyée avec le hash:", tx.hash);
+                                await tx.wait();
+                              }
                             }
                             
                             // On pourrait également récupérer les informations du test depuis le contrat
