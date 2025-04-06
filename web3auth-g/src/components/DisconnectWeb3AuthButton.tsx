@@ -1,8 +1,6 @@
 import { useWeb3Auth } from "@web3auth/modal-react-hooks";
 import React from "react";
 
-import web3AuthLogoWhite from "../assets/web3authLogoWhite.svg";
-
 const DisconnectWeb3AuthButton = () => {
   const { isConnected, logout } = useWeb3Auth();
 
@@ -13,7 +11,6 @@ const DisconnectWeb3AuthButton = () => {
         style={{ backgroundColor: "#0364ff" }}
         onClick={() => logout()}
       >
-        <img src={web3AuthLogoWhite} className="headerLogo" />
         Disconnect
       </div>
     );
