@@ -11,12 +11,12 @@ const clientId = "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw
 
 const privateKeyProvider = new EthereumPrivateKeyProvider({
   config: {
-    chainConfig: chain.ethereum,
+    chainConfig: chain.bahamut,
   },
 });
 
 const web3AuthOptions: Web3AuthOptions = {
-  chainConfig: chain.ethereum,
+  chainConfig: chain.bahamut,
   clientId,
   web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
   privateKeyProvider,
