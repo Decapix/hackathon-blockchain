@@ -4,7 +4,7 @@ import examData from "../question.json";
 import "../App.css";
 import axios from "axios";
 import { usePlayground } from "../services/playground";
-
+import { deployTestEvaluator, initializeTest, startTest } from "../services/testEvaluator";
 interface StyleProps {
   [key: string]: string | number | StyleProps;
 }
@@ -13,8 +13,12 @@ const ExamList: React.FC = () => {
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [exams, setExams] = useState<string[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const navigate = useNavigate();
   const { getUserInfo } = usePlayground();
+  const { provider, uiConsole } = usePlayground();
 
   useEffect(() => {
     // Load the exam data from question.json
@@ -148,7 +152,7 @@ const ExamList: React.FC = () => {
 
         // Open Streamlit in a new tab
         window.open('http://localhost:8501/test', '_blank');
-        
+
         // Redirection vers la page Menu après 1 seconde
         setTimeout(() => {
           navigate("/");
@@ -340,30 +344,53 @@ const ExamList: React.FC = () => {
                   padding: "12px 20px",
                   fontSize: "1rem",
                   fontWeight: "600",
-                  backgroundColor: selectedExam ? "#00c3ff" : "#2a2d3e",
+                  backgroundColor: (selectedExam && !loading) ? "#00c3ff" : "#2a2d3e",
                   color: "#ffffff",
                   border: "none",
                   borderRadius: "8px",
-                  cursor: selectedExam ? "pointer" : "not-allowed",
+                  cursor: (selectedExam && !loading) ? "pointer" : "not-allowed",
                   transition: "all 0.3s ease",
-                  boxShadow: selectedExam ? "0 0 10px rgba(0, 195, 255, 0.4)" : "none",
-                  opacity: selectedExam ? "1" : "0.6"
+                  boxShadow: (selectedExam && !loading) ? "0 0 10px rgba(0, 195, 255, 0.4)" : "none",
+                  opacity: (selectedExam && !loading) ? "1" : "0.6",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
                 } as React.CSSProperties}
                 onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  if(selectedExam) {
+                  if(selectedExam && !loading) {
                     e.currentTarget.style.backgroundColor = "#33ceff";
                     e.currentTarget.style.transform = "translateY(-2px)";
                     e.currentTarget.style.boxShadow = "0 0 15px rgba(0, 195, 255, 0.5)";
                   }
                 }}
                 onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  if(selectedExam) {
+                  if(selectedExam && !loading) {
                     e.currentTarget.style.backgroundColor = "#00c3ff";
                     e.currentTarget.style.transform = "translateY(0)";
                     e.currentTarget.style.boxShadow = "0 0 10px rgba(0, 195, 255, 0.4)";
                   }
                 }}
               >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Initializing on Blockchain...
+                  </>
+                ) : (
+                  <>
+                    <span style={{ marginRight: "10px", fontSize: "1.1rem" }}>
+                      🔗
+                    </span>
+                    Start Blockchain Exam
+                  </>
+                )}
                 <span
                   style={{
                     marginRight: "10px",

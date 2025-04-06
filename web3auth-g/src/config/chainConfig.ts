@@ -3,6 +3,16 @@ import { CHAIN_NAMESPACES, CustomChainConfig } from "@web3auth/base";
 export const chain: {
   [key: string]: CustomChainConfig;
 } = {
+  bahamut: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    chainId: "0x142d",
+    displayName: "Bahamut Mainnet",
+    rpcTarget: "https://bahamut-rpc.publicnode.com/",
+    blockExplorerUrl: "https://horizon.ftnscan.com",
+    ticker: "FTN",
+    tickerName: "Bahamut FTN",
+    logo: "https://web3auth.io/images/web3authlog.png",
+  },
   ethereum: {
     chainNamespace: CHAIN_NAMESPACES.EIP155,
     chainId: "0x1",

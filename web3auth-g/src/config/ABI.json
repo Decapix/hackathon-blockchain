@@ -1,11 +1,138 @@
 [
-  { "inputs": [{ "internalType": "string", "name": "initMessage", "type": "string" }], "stateMutability": "nonpayable", "type": "constructor" },
-  { "inputs": [], "name": "message", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" },
   {
-    "inputs": [{ "internalType": "string", "name": "newMessage", "type": "string" }],
-    "name": "update",
+    "inputs": [
+      { "internalType": "bytes32", "name": "emailHash", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "testId", "type": "bytes32" },
+      { "internalType": "bytes", "name": "consentSignature", "type": "bytes" },
+      { "internalType": "string", "name": "siweMessage", "type": "string" }
+    ],
+    "name": "initializeTest",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint16", "name": "totalQuestions", "type": "uint16" },
+      { "internalType": "uint64", "name": "startTimeOverride", "type": "uint64" }
+    ],
+    "name": "startTest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint16", "name": "correctAnswers", "type": "uint16" },
+      { "internalType": "uint8", "name": "fraudScore", "type": "uint8" },
+      { "internalType": "string", "name": "metadataURI", "type": "string" },
+      { "internalType": "uint64", "name": "endTimeOverride", "type": "uint64" }
+    ],
+    "name": "completeTest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "user", "type": "address" }],
+    "name": "getTestSession",
+    "outputs": [
+      { "internalType": "address", "name": "wallet", "type": "address" },
+      { "internalType": "bytes32", "name": "emailHash", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "testId", "type": "bytes32" },
+      { "internalType": "uint64", "name": "consentTimestamp", "type": "uint64" },
+      { "internalType": "uint64", "name": "startTime", "type": "uint64" },
+      { "internalType": "uint64", "name": "endTime", "type": "uint64" },
+      { "internalType": "uint32", "name": "durationSeconds", "type": "uint32" },
+      { "internalType": "uint16", "name": "totalQuestions", "type": "uint16" },
+      { "internalType": "uint16", "name": "correctAnswers", "type": "uint16" },
+      { "internalType": "uint16", "name": "score", "type": "uint16" },
+      { "internalType": "bool", "name": "passed", "type": "bool" },
+      { "internalType": "enum TestEvaluator.TestStatus", "name": "status", "type": "uint8" },
+      { "internalType": "uint8", "name": "fraudScore", "type": "uint8" },
+      { "internalType": "string", "name": "metadataURI", "type": "string" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "user", "type": "address" }],
+    "name": "getTestSignature",
+    "outputs": [
+      { "internalType": "string", "name": "siweMessage", "type": "string" },
+      { "internalType": "bytes", "name": "siweSignature", "type": "bytes" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "user", "type": "address" }],
+    "name": "getUserTestHistory",
+    "outputs": [
+      { "internalType": "uint256", "name": "testCount", "type": "uint256" },
+      { "internalType": "bytes32[]", "name": "testIds", "type": "bytes32[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": false, "internalType": "bytes32", "name": "testId", "type": "bytes32" },
+      { "indexed": false, "internalType": "uint64", "name": "timestamp", "type": "uint64" }
+    ],
+    "name": "TestInitialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": false, "internalType": "bytes32", "name": "testId", "type": "bytes32" },
+      { "indexed": false, "internalType": "uint64", "name": "timestamp", "type": "uint64" },
+      { "indexed": false, "internalType": "uint16", "name": "totalQuestions", "type": "uint16" }
+    ],
+    "name": "TestStarted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": false, "internalType": "bytes32", "name": "testId", "type": "bytes32" },
+      { "indexed": false, "internalType": "uint16", "name": "score", "type": "uint16" },
+      { "indexed": false, "internalType": "bool", "name": "passed", "type": "bool" },
+      { "indexed": false, "internalType": "uint64", "name": "startTime", "type": "uint64" },
+      { "indexed": false, "internalType": "uint64", "name": "endTime", "type": "uint64" },
+      { "indexed": false, "internalType": "uint32", "name": "duration", "type": "uint32" }
+    ],
+    "name": "TestCompleted",
+    "type": "event"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "testSessions",
+    "outputs": [
+      { "internalType": "address", "name": "wallet", "type": "address" },
+      { "internalType": "bytes32", "name": "emailHash", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "testId", "type": "bytes32" },
+      { "internalType": "bytes", "name": "consentSignature", "type": "bytes" },
+      { "internalType": "uint64", "name": "consentTimestamp", "type": "uint64" },
+      { "internalType": "uint64", "name": "startTime", "type": "uint64" },
+      { "internalType": "uint64", "name": "endTime", "type": "uint64" },
+      { "internalType": "uint32", "name": "durationSeconds", "type": "uint32" },
+      { "internalType": "uint16", "name": "totalQuestions", "type": "uint16" },
+      { "internalType": "uint16", "name": "correctAnswers", "type": "uint16" },
+      { "internalType": "uint16", "name": "score", "type": "uint16" },
+      { "internalType": "bool", "name": "passed", "type": "bool" },
+      { "internalType": "enum TestEvaluator.TestStatus", "name": "status", "type": "uint8" },
+      { "internalType": "uint8", "name": "fraudScore", "type": "uint8" },
+      { "internalType": "string", "name": "metadataURI", "type": "string" },
+      { "internalType": "string", "name": "siweMessage", "type": "string" },
+      { "internalType": "bytes", "name": "siweSignature", "type": "bytes" }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

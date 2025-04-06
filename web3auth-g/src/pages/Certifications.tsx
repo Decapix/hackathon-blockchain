@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../App.css";
 import axios from "axios";
 import { usePlayground } from "../services/playground";
+import QRCode from "react-qr-code";
 
 interface StyleObject {
   [key: string]: string | number | StyleObject;
@@ -91,14 +92,14 @@ const Certifications: React.FC = () => {
           setError(null);
           // Make API call to the backend to get certification results
           console.log(`Fetching certifications for user: ${userEmail}`);
-          
+
           // Use the same base URL that other components are successfully using (port 8502 instead of 5000)
           const API_BASE_URL = "http://localhost:8502";
           console.log(`Making request to: ${API_BASE_URL}/get_result?email=${userEmail}`);
-          
+
           // Add a timestamp to prevent caching issues
           const response = await axios.get(`${API_BASE_URL}/get_result`, {
-            params: { 
+            params: {
               email: userEmail,
               _t: new Date().getTime() // Cache-busting parameter
             },
@@ -109,7 +110,7 @@ const Certifications: React.FC = () => {
             // Increase timeout for slower connections
             timeout: 10000
           });
-          
+
           console.log('Certification data received:', response.data);
           // Sort the results by timestamp in descending order (most recent first)
           const sortedData = [...response.data].sort((a, b) => {
@@ -131,6 +132,7 @@ const Certifications: React.FC = () => {
       fetchCertifications();
     }
   }, [userEmail]);
+  const [zoomedQR, setZoomedQR] = useState<string | null>(null);
 
   const handleBackClick = (): void => {
     navigate("/");
@@ -144,38 +146,38 @@ const Certifications: React.FC = () => {
         console.error("Missing timestamp value");
         return "Date unavailable";
       }
-      
+
       // Convertir en nombre si c'est une chaîne
       const timestampNum = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
-      
+
       if (isNaN(timestampNum)) {
         console.error("Invalid timestamp value:", timestamp);
         return "Invalid date format";
       }
-      
+
       // Convertir les secondes en millisecondes pour JavaScript Date
       const date = new Date(timestampNum * 1000);
-      
+
       // Vérifier si la date est valide
       if (isNaN(date.getTime())) {
         console.error("Created invalid date object from timestamp:", timestampNum);
         return "Invalid date";
       }
-      
+
       // Formatage de la date avec jour, mois, année
       const dateStr = date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
       });
-      
+
       // Formatage de l'heure au format 24h
       const timeStr = date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false
       });
-      
+
       // Combiner date et heure
       return `${dateStr} at ${timeStr}`;
     } catch (e) {
@@ -184,8 +186,16 @@ const Certifications: React.FC = () => {
     }
   };
 
+  const handleQRCodeClick = (url: string): void => {
+    setZoomedQR(url);
+  };
+
+  const closeZoomedQR = (): void => {
+    setZoomedQR(null);
+  };
+
   return (
-    <div 
+    <div
       style={{
         backgroundImage: "url('/img.jpg')",
         backgroundSize: "cover",
@@ -339,6 +349,59 @@ const Certifications: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal pour afficher le QR code en grand */}
+      {zoomedQR && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            cursor: "pointer"
+          }}
+          onClick={closeZoomedQR}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "10px",
+              boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <QRCode value={zoomedQR} size={250} />
+            <p style={{ color: "#121212", fontSize: "16px", textAlign: "center" }}>
+              {zoomedQR}
+            </p>
+            <button
+              onClick={closeZoomedQR}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#6a98f0",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontWeight: "bold"
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
