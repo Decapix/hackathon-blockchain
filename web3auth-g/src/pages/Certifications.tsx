@@ -194,28 +194,46 @@ const Certifications: React.FC = () => {
     setZoomedQR(null);
   };
 
-  // Nouvelle fonction pour générer et télécharger un PDF vide
-  const downloadEmptyPDF = (): void => {
-    // Création d'un élément temporaire pour le téléchargement
-    const link = document.createElement('a');
-    
-    // URL du PDF vide (un blob vide avec le type MIME pour PDF)
-    const file = new Blob([' '], { type: 'application/pdf' });
-    
-    // Création d'une URL object pour le blob
-    const fileURL = URL.createObjectURL(file);
-    
-    // Configuration de l'élément pour le téléchargement
-    link.href = fileURL;
-    link.download = `certification-${zoomedQR}.pdf`;
-    
-    // Ajout temporaire au DOM pour déclencher le téléchargement
-    document.body.appendChild(link);
-    link.click();
-    
-    // Nettoyage
-    document.body.removeChild(link);
-    URL.revokeObjectURL(fileURL);
+  // Fonction pour télécharger le PDF de certification depuis l'API backend
+  const downloadCertificationPDF = async (): Promise<void> => {
+    try {
+      // Utiliser la même base URL que pour les autres requêtes API
+      const API_BASE_URL = "http://localhost:8502";
+      const pdfUrl = `${API_BASE_URL}/last-exam-pdf`;
+      
+      console.log(`Téléchargement du certificat PDF depuis: ${pdfUrl}`);
+      
+      // Utiliser axios pour obtenir le PDF en tant que blob
+      const response = await axios.get(pdfUrl, {
+        responseType: 'blob', // Important pour recevoir les données binaires
+        headers: {
+          'Accept': 'application/pdf'
+        },
+        timeout: 10000
+      });
+      
+      // Créer une URL pour le blob reçu
+      const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(pdfBlob);
+      
+      // Configurer l'élément pour le téléchargement
+      const link = document.createElement('a');
+      link.href = fileURL;
+      link.download = `certification-${zoomedQR}.pdf`;
+      
+      // Déclencher le téléchargement
+      document.body.appendChild(link);
+      link.click();
+      
+      // Nettoyage
+      document.body.removeChild(link);
+      URL.revokeObjectURL(fileURL);
+      
+      console.log('Téléchargement du PDF réussi');
+    } catch (error) {
+      console.error('Erreur lors du téléchargement du PDF:', error);
+      alert('Erreur lors du téléchargement du certificat. Veuillez réessayer.');
+    }
   };
 
   return (
@@ -436,7 +454,7 @@ const Certifications: React.FC = () => {
                 Close
               </button>
               <button
-                onClick={downloadEmptyPDF}
+                onClick={downloadCertificationPDF}
                 style={{
                   padding: "10px 20px",
                   backgroundColor: "#4CAF50",
