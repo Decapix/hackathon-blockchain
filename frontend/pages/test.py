@@ -5,21 +5,83 @@ import requests
 from GazeTracking.gaze_tracking import GazeTracking
 from questions import QUESTIONS
 
-API_URL = "http://backend:8000/get_last_exam_global"
+# --- Timer de démarrage ---
+if 'timer_started' not in st.session_state:
+    st.session_state.timer_started = False
+    st.session_state.timer_completed = False
 
-st.write("Dernier examen enregistré")
+if not st.session_state.timer_started:
+    st.session_state.timer_started = True
+    
+    st.markdown("<h1 style='text-align: center;'>L'examen va commencer...</h1>", unsafe_allow_html=True)
+    
+    # Créer un conteneur centré pour le timer
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col2:
+        timer_placeholder = st.empty()
+    
+    # Affiche un cercle qui fait un tour complet en 3 secondes
+    svg_code = f'''
+    <div style="display: flex; justify-content: center; margin-top: 50px;">
+        <div style="position: relative; width: 200px; height: 200px;">
+            <svg width="200" height="200" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="90" fill="none" stroke="#333333" stroke-width="10"/>
+                <circle cx="100" cy="100" r="90" fill="none" stroke="#39FF14" stroke-width="10"
+                    stroke-dasharray="565.48" 
+                    stroke-dashoffset="0"
+                    transform="rotate(-90, 100, 100)"
+                    style="animation: countdown 3s linear forwards;">
+                    <animate 
+                        attributeName="stroke-dashoffset" 
+                        from="0" 
+                        to="565.48" 
+                        dur="3s" 
+                        begin="0s" 
+                        fill="freeze" />
+                </circle>
+            </svg>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                       font-size: 70px; color: #39FF14; font-weight: bold;">
+                3
+            </div>
+        </div>
+    </div>
+    <style>
+        @keyframes countdown {{
+            from {{ stroke-dashoffset: 0; }}
+            to {{ stroke-dashoffset: 565.48; }}
+        }}
+    </style>
+    '''
+    
+    timer_placeholder.markdown(svg_code, unsafe_allow_html=True)
+    
+    # Compte à rebours de 3 à 1 avec un seul cercle qui tourne
+    for seconds_left in range(3, 0, -1):
+        if seconds_left < 3:  # Update only the number for seconds 2 and 1
+            timer_placeholder.markdown(
+                svg_code.replace(f'font-size: 70px; color: #39FF14; font-weight: bold;">\n                3', 
+                                f'font-size: 70px; color: #39FF14; font-weight: bold;">\n                {seconds_left}'),
+                unsafe_allow_html=True
+            )
+        time.sleep(1)
+    
+    st.session_state.timer_completed = True
+    st.rerun()
+
+API_URL = "http://backend:8000/get_last_exam_global"
 
 try:
     response = requests.get(API_URL)
     response.raise_for_status()
     data = response.json()
 
-    if data:
-        st.subheader("Détails de l'examen")
-        for key, value in data.items():
-            st.write(f"**{key}**: {value}")
-    else:
-        st.info("Aucun examen trouvé.")
+    # if data:
+    #     st.subheader("Détails de l'examen")
+    #     for key, value in data.items():
+    #         st.write(f"**{key}**: {value}")
+    # else:
+    #     st.info("Aucun examen trouvé.")
 
 except requests.exceptions.RequestException as e:
     st.error(f"Erreur lors de la requête : {e}")
@@ -85,6 +147,7 @@ st.markdown(
         background-color: #ffb200;
         height: 100%;
         border-radius: 5px;
+        transition: width 0.5s ease-in-out;
     }
     </style>
     """,
@@ -136,7 +199,7 @@ else:
     API_URL = "http://backend:8000/update_exam"
     
     correct_answers = [q["correct_answer"] for q in QUESTIONS[exam]]
-    score = sum(1 for user_answer, correct_answer in zip(st.session_state.user_answers, correct_answers) if user_answer == correct_answer) / total_questions
+    score = sum(1 for user_answer, correct_answer in zip(st.session_state.user_answers, correct_answers) if user_answer == correct_answer)
     cheat_percentage = (len(st.session_state.cheated_questions) / total_questions)
     passed = score >= 0.6 and cheat_percentage < 0.2
 
@@ -144,7 +207,7 @@ else:
     response = requests.post(API_URL, json={
         "email": data["email"],
         "exam_id": data["exam_id"],
-        "score": score,
+        "score": score / total_questions,
         "cheat_score": cheat_percentage,
         "passed": passed,
         "details": {
@@ -155,7 +218,7 @@ else:
     })
     response.raise_for_status()
 
-    st.success(f"✅ Vous avez terminé toutes les questions ! Votre score est de {score * 100:.2f}.")
+    st.success(f"✅ Vous avez terminé toutes les questions ! Votre score est de {score / total_questions * 100:.2f}.")
     if cheat_percentage > 0:
         st.warning(f"⚠️ Vous avez été détecté en train de tricher {cheat_percentage * 100:.2f}% du temps.")
 
