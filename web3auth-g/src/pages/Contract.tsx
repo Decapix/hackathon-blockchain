@@ -1,5 +1,6 @@
 import { useWeb3Auth } from "@web3auth/modal-react-hooks";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { BrowserProvider, ContractFactory, ethers } from "ethers";
 
 import Console from "../components/Console";
 import Form from "../components/Form";
@@ -39,7 +40,87 @@ function Contract() {
   );
 
   const { deployContract, readContract, writeContract } = usePlayground();
-  const { isConnected } = useWeb3Auth();
+  const { isConnected, provider } = useWeb3Auth();
+  
+  // Charger dynamiquement le bytecode du fichier bytecode.txt
+  useEffect(() => {
+    const loadBytecode = async () => {
+      try {
+        const response = await fetch('/bytecode.txt');
+        if (response.ok) {
+          const text = await response.text();
+          const formattedBytecode = text.trim().startsWith('0x') ? text.trim() : `0x${text.trim()}`;
+          setBytecode(formattedBytecode);
+          console.log("✅ Bytecode chargé avec succès");
+        } else {
+          console.error("❌ Erreur lors du chargement du bytecode:", response.status);
+        }
+      } catch (error) {
+        console.error("❌ Erreur lors du chargement du bytecode:", error);
+      }
+    };
+    
+    loadBytecode();
+  }, []);
+  
+  // Méthode pour déployer un contrat directement avec ethers.js (implémentation des étapes 1 à 5)
+  const deployContractDirect = async () => {
+    try {
+      setLoading(true);
+      
+      // Vérifier que le provider est disponible
+      if (!provider) {
+        console.error("Provider Web3Auth non disponible, connectez-vous d'abord");
+        return;
+      }
+      
+      // Étape 2: Convertir le provider pour l'utiliser avec ethers.js
+      const ethersProvider = new BrowserProvider(provider as any);
+      const signer = await ethersProvider.getSigner();
+      
+      // Étape 3: Charger l'ABI et le Bytecode du contrat
+      let parsedAbi;
+      try {
+        // Pour gérer à la fois l'ABI déjà formaté en JSON ou en string
+        parsedAbi = typeof abi === 'string' ? JSON.parse(abi) : abi;
+      } catch (e) {
+        console.error("Erreur lors du parsing de l'ABI:", e);
+        throw new Error("ABI invalide");
+      }
+      
+      // S'assurer que le bytecode a le préfixe 0x
+      const bytecodeWithPrefix = bytecode.startsWith('0x') ? bytecode : '0x' + bytecode;
+      
+      console.log("🔄 Création de la factory de contrat...");
+      
+      // Étape 4: Créer la ContractFactory et déployer
+      const factory = new ContractFactory(parsedAbi, bytecodeWithPrefix, signer);
+      
+      console.log("🚀 Déploiement du contrat en cours...");
+      const contract = await factory.deploy(contractValue);
+      
+      console.log("⏳ Transaction envoyée, en attente de confirmation...");
+      await contract.waitForDeployment();
+      
+      // Étape 5: Récupérer et stocker l'adresse du contrat
+      const contractAddress = await contract.getAddress();
+      console.log("✅ Contrat déployé avec succès à l'adresse:", contractAddress);
+      
+      // Mettre à jour l'interface
+      setAddress(contractAddress);
+      
+      // Afficher l'adresse de l'utilisateur qui a déployé
+      const userAddress = await signer.getAddress();
+      console.log("👤 Contrat déployé par:", userAddress);
+      
+      return contract;
+    } catch (error) {
+      console.error("❌ Erreur lors du déploiement du contrat:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formDetailsDeploy = [
     {
@@ -118,18 +199,28 @@ function Contract() {
               <Tabs tabData={TabData} />
               {tab === "deploy" ? (
                 <Form formDetails={formDetailsDeploy}>
-                  <LoaderButton
-                    className="w-full mt-10 mb-0 text-center justify-center items-center flex rounded-full px-6 py-3 text-white"
-                    style={{ backgroundColor: "#0364ff" }}
-                    onClick={async () => {
-                      setLoading(true);
-                      const receipt = await deployContract(abi, bytecode, contractValue);
-                      setAddress(receipt.target);
-                      setLoading(false);
-                    }}
-                  >
-                    Deploy Contract
-                  </LoaderButton>
+                  <div className="flex flex-col space-y-4 w-full">
+                    <LoaderButton
+                      className="w-full mt-10 mb-0 text-center justify-center items-center flex rounded-full px-6 py-3 text-white"
+                      style={{ backgroundColor: "#0364ff" }}
+                      onClick={async () => {
+                        setLoading(true);
+                        const receipt = await deployContract(abi, bytecode, contractValue);
+                        setAddress(receipt.target);
+                        setLoading(false);
+                      }}
+                    >
+                      Deploy Contract (via usePlayground)
+                    </LoaderButton>
+                    
+                    <LoaderButton
+                      className="w-full mt-4 mb-0 text-center justify-center items-center flex rounded-full px-6 py-3 text-white"
+                      style={{ backgroundColor: "#2c974b" }}
+                      onClick={deployContractDirect}
+                    >
+                      Deploy Contract Directly (via ethers.js)
+                    </LoaderButton>
+                  </div>
                 </Form>
               ) : null}
               {tab === "read" ? (
