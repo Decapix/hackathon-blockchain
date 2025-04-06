@@ -217,11 +217,335 @@ else:
         }
     })
     response.raise_for_status()
+    
+    # Animation de victoire professionnelle si le score est supérieur à 50%
+    if passed:
+        success_css = """
+        <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes shine {
+            0% { background-position: -100px; }
+            100% { background-position: 300px; }
+        }
+        
+        .success-container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-out;
+            border: 1px solid #39FF14;
+        }
+        
+        .success-title {
+            font-family: 'Courier New', monospace;
+            color: #39FF14;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            animation: slideUp 1s ease-out;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.7);
+        }
+        
+        .success-subtitle {
+            font-family: 'Courier New', monospace;
+            color: white;
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            animation: slideUp 1.2s ease-out;
+        }
+        
+        .score-display {
+            font-family: 'Courier New', monospace;
+            color: #39FF14;
+            text-align: center;
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            animation: slideUp 1.4s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .score-display::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.4), transparent);
+            animation: shine 2s infinite;
+        }
+        
+        .certificate {
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: slideUp 1.6s ease-out;
+            color: #333;
+            text-align: center;
+        }
+        
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.05"><path d="M0,0 L100,100 M100,0 L0,100" stroke="black" stroke-width="1"/></svg>');
+            z-index: 0;
+            border-radius: 8px;
+        }
+        
+        .certificate h3 {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .certificate p {
+            font-family: 'Times New Roman', serif;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .seal {
+            width: 80px;
+            height: 80px;
+            margin: 15px auto;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffec99, #ffcc00);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .seal::after {
+            content: '✓';
+            font-size: 40px;
+            color: #333;
+        }
+        
+        .date {
+            font-style: italic;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        </style>
+        """
+        
+        # Obtention de la date actuelle
+        import datetime
+        current_date = datetime.datetime.now().strftime("%d %B, %Y")
+        
+        success_html = f"""
+        {success_css}
+        <div class="success-container">
+            <h1 class="success-title">Congratulations !</h1>
+            <h2 class="success-subtitle">You have passed the exam.</h2>
+            <h3 class="score-display-failure">Your score : {score / total_questions * 100:.2f}%</h3>
+            <h3 class="score-display-cheating">Our fraud detection detected a 
+            {cheat_percentage*100}% chance of cheating, you are therefore eligible.</h3>
+        </div>
+        """
+        
+        st.markdown(success_html, unsafe_allow_html=True)
+    else:
+        failure_css = """
+        <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        .failure-container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-out;
+            border: 1px solid #ff3333;
+        }
+        
+        .failure-title {
+            font-family: 'Courier New', monospace;
+            color: #ff3333;
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            animation: slideUp 1s ease-out;
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.7);
+        }
+        
+        .failure-subtitle {
+            font-family: 'Courier New', monospace;
+            color: white;
+            text-align: center;
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            animation: slideUp 1.2s ease-out;
+        }
+        
+        .score-display-failure {
+            font-family: 'Courier New', monospace;
+            color: #ff3333;
+            text-align: center;
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            animation: slideUp 1.4s ease-out;
+            position: relative;
+        }
+        
+        .retry-message {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: slideUp 1.6s ease-out, pulse 2s infinite ease-in-out;
+            color: white;
+            text-align: center;
+            border-left: 4px solid #ff3333;
+        }
+        
+        .retry-message h3 {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            color: #ffc107;
+        }
+        
+        .retry-message p {
+            font-family: 'Courier New', monospace;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 0.8em;
+        }
+        
+        .feedback-list {
+            text-align: left;
+            width: 80%;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #252525;
+            border-radius: 8px;
+            animation: slideUp 1.8s ease-out;
+        }
+        
+        .feedback-list h4 {
+            font-family: 'Courier New', monospace;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .feedback-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .feedback-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+            font-family: 'Courier New', monospace;
+            color: #cccccc;
+        }
+        
+        .feedback-list li::before {
+            content: '> ';
+            color: #ff3333;
+            font-weight: bold;
+        }
+        
+        .terminal-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ff3333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-decoration: none;
+            animation: slideUp 2s ease-out;
+            transition: background-color 0.3s ease;
+        }
+        
+        .terminal-button:hover {
+            background-color: #ff6666;
+            cursor: pointer;
+        }
+        </style>
+        """
+        # Calcul du score en pourcentage
+        score_percent = (score / total_questions) * 100
 
-    st.success(f"✅ Vous avez terminé toutes les questions ! Votre score est de {score / total_questions * 100:.2f}.")
-    if cheat_percentage > 0:
-        st.warning(f"⚠️ Vous avez été détecté en train de tricher {cheat_percentage * 100:.2f}% du temps.")
+        # Message de suspicion de fraude
+        if score_percent > 40:
+            failure_subtitle = f"""
+            We detected a too high chance of cheating."""
+            fraud_message = f"""
+            Our fraud detection detected a {cheat_percentage*100}% chance of cheating, 
+            you are therefore not eligible."""
+        else:
+            failure_subtitle = f"""You have not reached the minimum score required."""
+            fraud_message = f"""
+            Our fraud detection detected a {cheat_percentage*100}% chance of cheating."""
 
+        # HTML à afficher en cas d'échec
+        failure_html = f"""
+        {failure_css}
+        <div class="failure-container">
+            <h1 class="failure-title">Exam not validated</h1>
+            <h2 class="failure-subtitle">{failure_subtitle}</h2>
+            <h3 class="score-display-failure">Your score : {score_percent:.2f}%</h3>
+            <h3 class="score-display-cheating">{fraud_message}</h3>
+        </div>
+        """
+
+        st.markdown(failure_html, unsafe_allow_html=True)
 
 # --- Webcam dans la sidebar ---
 st.sidebar.header("Webcam en direct")
