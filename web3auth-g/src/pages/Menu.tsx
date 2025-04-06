@@ -1,21 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 import { useWeb3Auth } from "@web3auth/modal-react-hooks";
 import DisconnectWeb3AuthButton from "../components/DisconnectWeb3AuthButton";
 
-interface StyleProps {
-  [key: string]: string | number;
-}
-
 const Menu: React.FC = () => {
   const navigate = useNavigate();
-  const { isConnected, connect } = useWeb3Auth();
+  const { isConnected, connect, provider } = useWeb3Auth();
 
-  const handleSignIn = () => {
-    connect().then(() => {
-      // Vous pouvez ajouter une redirection ici si nécessaire
-    });
+  useEffect(() => {
+    const getUserInfo = async () => {
+      if (isConnected && provider) {
+        try {
+          // Cast the provider to 'any' to access getUserInfo method
+          const web3authProvider = provider as any;
+          const userInfo = await web3authProvider.getUserInfo();
+          if (userInfo.email) {
+            console.log("User email:", userInfo.email);
+            localStorage.setItem('userEmail', userInfo.email);
+          }
+        } catch (error) {
+          console.error("Error getting user info:", error);
+        }
+      }
+    };
+
+    getUserInfo();
+  }, [isConnected, provider]);
+
+  const handleSignIn = async () => {
+    try {
+      await connect();
+      // After connection, the useEffect will handle getting the user info
+    } catch (error) {
+      console.error("Connection error:", error);
+    }
   };
 
   const handleExamsClick = (): void => {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import examData from "../question.json";
 import "../App.css";
+import axios from "axios";
+import { usePlayground } from "../services/playground";
 
 interface StyleProps {
   [key: string]: string | number | StyleProps;
@@ -10,22 +12,168 @@ interface StyleProps {
 const ExamList: React.FC = () => {
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [exams, setExams] = useState<string[]>([]);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { getUserInfo } = usePlayground();
 
   useEffect(() => {
     // Load the exam data from question.json
     setExams(examData);
   }, []);
 
+  useEffect(() => {
+    // Fonction pour obtenir les informations utilisateur
+    const fetchUserInfo = async () => {
+      try {
+        // Récupérer les infos utilisateur depuis le contexte Playground
+        const userInfo = await getUserInfo();
+        console.log("Playground userInfo:", userInfo);
+
+        if (userInfo && userInfo.email) {
+          console.log("Email trouvé dans Playground:", userInfo.email);
+          setUserEmail(userInfo.email);
+          localStorage.setItem('userEmail', userInfo.email);
+        } else {
+          // Fallback: essayer directement depuis le localStorage
+          const storedEmail = localStorage.getItem('userEmail');
+          if (storedEmail) {
+            console.log("Email trouvé dans localStorage:", storedEmail);
+            setUserEmail(storedEmail);
+          } else {
+            // Solution de dernier recours: demander à l'utilisateur
+            const emailInput = prompt("Veuillez entrer votre adresse email pour continuer:");
+            if (emailInput) {
+              console.log("Email saisi manuellement:", emailInput);
+              setUserEmail(emailInput);
+              localStorage.setItem('userEmail', emailInput);
+            } else {
+              console.error("Aucun email fourni");
+              alert("Un email est nécessaire pour continuer. Vous allez être redirigé vers le menu.");
+              navigate("/menu");
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des informations utilisateur:", error);
+        // Fallback en cas d'erreur
+        const storedEmail = localStorage.getItem('userEmail');
+        if (storedEmail) {
+          console.log("Email trouvé dans localStorage après erreur:", storedEmail);
+          setUserEmail(storedEmail);
+        } else {
+          // Solution de dernier recours: demander à l'utilisateur
+          const emailInput = prompt("Veuillez entrer votre adresse email pour continuer:");
+          if (emailInput) {
+            console.log("Email saisi manuellement après erreur:", emailInput);
+            setUserEmail(emailInput);
+            localStorage.setItem('userEmail', emailInput);
+          } else {
+            console.error("Aucun email fourni après erreur");
+            alert("Un email est nécessaire pour continuer. Vous allez être redirigé vers le menu.");
+            navigate("/menu");
+          }
+        }
+      }
+    };
+
+    fetchUserInfo();
+  }, [getUserInfo, navigate]);
+
   const handleExamChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedExam(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedExam) {
-      console.log(`Starting exam: ${selectedExam}`);
-      window.open('http://localhost:8501/test', '_blank');
+      try {
+      console.log(`Entering try`);
+      // Use the userEmail state we've already fetched
+      if (!userEmail) {
+        const errorMsg = "User email not found. Please sign in again.";
+        console.error(errorMsg);
+        alert(errorMsg);
+        navigate("/menu"); // Redirect to menu to force re-authentication
+        return;
+      }
+
+      console.log(`Starting exam: ${selectedExam} for user: ${userEmail}`);
+
+      // Make API call to backend to start the exam
+      const requestData = {
+        email: userEmail,
+        exam_id: 1,
+      };
+
+      console.log('Calling backend API with data:', requestData);
+
+      try {
+        // Try different backend URLs in sequence
+        const backendUrls = [
+          'http://backend:8000/init_exam',
+        ];
+
+        console.log('Attempting to connect to backend services...');
+        let response = null;
+        let lastError = null;
+
+        for (const url of backendUrls) {
+          try {
+            console.log(`Trying backend URL: ${url}`);
+            response = await axios.post(url, requestData, {
+              timeout: 5000
+            });
+            console.log(`Successfully connected to ${url}`);
+            break;
+          } catch (err) {
+            console.log(`Failed to connect to ${url}:`, err);
+            lastError = err;
+          }
+        }
+
+        if (!response) {
+          throw lastError || new Error('Failed to connect to any backend service');
+        }
+
+        console.log('Exam session started:', response.data);
+
+        if (!response.data || !response.data.session_id) {
+          throw new Error('Backend response missing session_id');
+        }
+
+        localStorage.setItem('examSessionId', response.data.session_id);
+        localStorage.setItem('currentExam', selectedExam);
+
+        // Ouvre la session d’examen dans Streamlit
+        window.open('http://localhost:8501/test', '_blank');
+      } catch (axiosError) {
+        throw axiosError; // Rethrow to be caught by the outer catch
+      }
+    } catch (error: any) {
+      // Get detailed error information
+      let errorMessage = "Failed to start exam: ";
+
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNREFUSED' || error.code === 'ECONNABORTED') {
+          errorMessage += "Cannot connect to backend server. Is the server running?";
+        } else if (error.response) {
+          // The request was made and the server responded with a status code outside of 2xx range
+          errorMessage += `Server error: ${error.response.status} - ${error.response.data.message || error.response.statusText}`;
+        } else if (error.request) {
+          // The request was made but no response was received
+          errorMessage += "No response from server. Check network connection.";
+        } else {
+          // Something happened in setting up the request
+          errorMessage += error.message || "Unknown network error";
+        }
+      } else {
+        // Not an Axios error
+        errorMessage += error.message || "Unknown error";
+      }
+
+      console.error("Detailed error starting exam:", error);
+      alert(errorMessage);
+      }
     }
   };
 
@@ -34,7 +182,7 @@ const ExamList: React.FC = () => {
   };
 
   return (
-    <div 
+    <div
       style={{
         backgroundImage: "url('/img.jpg')",
         backgroundSize: "cover",
@@ -50,7 +198,7 @@ const ExamList: React.FC = () => {
         padding: "20px"
       } as React.CSSProperties}
     >
-      <div 
+      <div
         style={{
           maxWidth: "800px",
           width: "100%",
@@ -61,9 +209,9 @@ const ExamList: React.FC = () => {
           textAlign: "center"
         } as React.CSSProperties}
       >
-        <h1 
-          style={{ 
-            marginBottom: "40px", 
+        <h1
+          style={{
+            marginBottom: "20px",
             color: "#6a98f0",
             fontSize: "2.5rem",
             fontWeight: "700"
@@ -71,7 +219,26 @@ const ExamList: React.FC = () => {
         >
           List of <span style={{ color: "#00c3ff" }}>Exams</span>
         </h1>
-        
+
+        {userEmail && (
+          <div
+            style={{
+              marginBottom: "20px",
+              padding: "8px 15px",
+              backgroundColor: "rgba(0, 195, 255, 0.1)",
+              borderRadius: "6px",
+              border: "1px solid rgba(0, 195, 255, 0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#e0e0e0"
+            } as React.CSSProperties}
+          >
+            <span style={{ fontSize: "1.1rem", marginRight: "10px" }}>👤</span>
+            <span style={{ fontWeight: "500" }}>{userEmail}</span>
+          </div>
+        )}
+
         <div
           style={{
             marginBottom: "30px",
@@ -83,7 +250,7 @@ const ExamList: React.FC = () => {
           <p style={{ marginBottom: "20px" }}>
             Select an exam to start your evaluation.
           </p>
-          
+
           <form onSubmit={handleSubmit}>
             <div
               style={{
@@ -91,7 +258,7 @@ const ExamList: React.FC = () => {
                 textAlign: "left"
               } as React.CSSProperties}
             >
-              <label 
+              <label
                 htmlFor="examSelect"
                 style={{
                   display: "block",
@@ -126,7 +293,7 @@ const ExamList: React.FC = () => {
                 ))}
               </select>
             </div>
-            
+
             <div
               style={{
                 display: "flex",
@@ -135,8 +302,8 @@ const ExamList: React.FC = () => {
                 marginTop: "25px"
               } as React.CSSProperties}
             >
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={handleBackClick}
                 style={{
                   padding: "12px 20px",
@@ -158,9 +325,9 @@ const ExamList: React.FC = () => {
               >
                 Back
               </button>
-              
-              <button 
-                type="submit" 
+
+              <button
+                type="submit"
                 disabled={!selectedExam}
                 style={{
                   padding: "12px 20px",
@@ -190,8 +357,8 @@ const ExamList: React.FC = () => {
                   }
                 }}
               >
-                <span 
-                  style={{ 
+                <span
+                  style={{
                     marginRight: "10px",
                     fontSize: "1.1rem"
                   } as React.CSSProperties}
@@ -204,7 +371,7 @@ const ExamList: React.FC = () => {
           </form>
         </div>
 
-        <div 
+        <div
           style={{
             marginTop: "40px",
             opacity: "0.7",
@@ -212,7 +379,7 @@ const ExamList: React.FC = () => {
           } as React.CSSProperties}
         >
           <p>Secured by blockchain technology</p>
-          <div 
+          <div
             style={{
               display: "flex",
               justifyContent: "center",
