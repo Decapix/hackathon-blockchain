@@ -13,7 +13,7 @@ if 'timer_started' not in st.session_state:
 if not st.session_state.timer_started:
     st.session_state.timer_started = True
     
-    st.markdown("<h1 style='text-align: center;'>L'examen va commencer...</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>Test will start in...</h1>", unsafe_allow_html=True)
     
     # Créer un conteneur centré pour le timer
     col1, col2, col3 = st.columns([1, 3, 1])
@@ -174,7 +174,7 @@ st.markdown(
 )
 
 # --- Titre avec effet dégradé ---
-st.markdown('<div class="title-gradient">Questions QCM et Webcam</div>', unsafe_allow_html=True)
+st.markdown('<div class="title-gradient">Blockchain Pro</div>', unsafe_allow_html=True)
 
 # --- Initialisation session ---
 if 'question_index' not in st.session_state:
@@ -198,7 +198,7 @@ st.markdown(f"""
     <div class="progress-bar" style="width:{progress_percent}%"></div>
 </div>
 <div style="text-align: right; font-size: 0.9em; color: #666; margin-bottom: 20px;">
-    Question {st.session_state.question_index + 1} sur {total_questions}
+    Question {st.session_state.question_index + 1} out of {total_questions}
 </div>
 """, unsafe_allow_html=True)
 
@@ -210,7 +210,7 @@ if st.session_state.question_index < total_questions:
     # Titre de la question avec style
     st.markdown(f"""
     <div class="question-header">
-        <strong>Question {st.session_state.question_index + 1}:</strong> {q.get("text", "Répondez à la question suivante :")}
+        <strong>Question {st.session_state.question_index + 1}:</strong> {q.get("question")}
     </div>
     """, unsafe_allow_html=True)
     
@@ -219,7 +219,7 @@ if st.session_state.question_index < total_questions:
     # Bouton aligné à droite
     col1, col2, col3 = st.columns([5, 1, 2])
     with col3:
-        if st.button("Valider", key=f"submit_{st.session_state.question_index}"):
+        if st.button("Submit", key=f"submit_{st.session_state.question_index}"):
             st.session_state.user_answers.append(choice)
             st.session_state.question_index += 1
             st.rerun()
@@ -396,8 +396,8 @@ else:
         st.markdown(failure_html, unsafe_allow_html=True)
 
 # --- Webcam dans la sidebar ---
-st.sidebar.header("Webcam en direct")
-start_webcam = st.sidebar.checkbox('Démarrer la webcam', key='webcam_checkbox')
+st.sidebar.header("Live Webcam")
+start_webcam = st.sidebar.checkbox('Launch webcam', key='webcam_checkbox')
 
 if 'cap' not in st.session_state:
     st.session_state.cap = cv2.VideoCapture(0)
