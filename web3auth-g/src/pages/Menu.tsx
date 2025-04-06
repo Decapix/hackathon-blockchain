@@ -7,6 +7,7 @@ import DisconnectWeb3AuthButton from "../components/DisconnectWeb3AuthButton";
 const Menu: React.FC = () => {
   const navigate = useNavigate();
   const { isConnected, connect, provider } = useWeb3Auth();
+  const [isLoading, setIsLoading] = React.useState(true);
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -23,6 +24,8 @@ const Menu: React.FC = () => {
           console.error("Error getting user info:", error);
         }
       }
+      // Définir isLoading à false une fois que la vérification est terminée
+      setIsLoading(false);
     };
 
     getUserInfo();
@@ -84,7 +87,29 @@ const Menu: React.FC = () => {
           La <span style={{ color: "#00c3ff" }}>Certif</span>
         </h1>
         
-        {!isConnected ? (
+        {isLoading ? (
+          // Indicateur de chargement pendant la vérification de la connexion
+          <div style={{ padding: "20px", textAlign: "center" }}>
+            <div 
+              style={{ 
+                display: "inline-block", 
+                width: "40px", 
+                height: "40px", 
+                border: "4px solid rgba(106, 152, 240, 0.3)", 
+                borderTop: "4px solid #6a98f0", 
+                borderRadius: "50%", 
+                animation: "spin 1s linear infinite" 
+              }} 
+            />
+            <style>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
+            <p style={{ marginTop: "10px", color: "#6a98f0" }}>Chargement de l'interface...</p>
+          </div>
+        ) : !isConnected ? (
           <button
             onClick={handleSignIn}
             style={{
