@@ -24,16 +24,18 @@ const web3AuthOptions: Web3AuthOptions = {
 
 const authAdapter = new AuthAdapter({
   loginSettings: {
-    mfaLevel: MFA_LEVELS.OPTIONAL,
+    mfaLevel: MFA_LEVELS.NONE,
   },
   adapterSettings: {
     uxMode: UX_MODE.REDIRECT, // "redirect" | "popup"
+    redirectUrl: window.location.origin + "/menu",
   },
 });
 
 const walletServicesPlugin = new WalletServicesPlugin({
   wsEmbedOpts: {},
   walletInitOptions: {
+    whiteLabel: { showWidgetButton: false },
     whiteLabel: { showWidgetButton: false }, // Désactivation du bouton de widget
     confirmationStrategy: CONFIRMATION_STRATEGY.MODAL,
   },

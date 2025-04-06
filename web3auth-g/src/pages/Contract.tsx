@@ -1,5 +1,6 @@
 import { useWeb3Auth } from "@web3auth/modal-react-hooks";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { BrowserProvider, ContractFactory, ethers } from "ethers";
 
 import Console from "../components/Console";
 import Form from "../components/Form";
@@ -19,7 +20,12 @@ function Contract() {
   const [contractValue, setContractValue] = useState<string>("Welcome to Web3Auth");
   const [address, setAddress] = useState("0x28Fd42Ce70427811dE533537B04eF1a137948a81");
   const [loading, setLoading] = useState(false);
-
+  const [testStartTime, setTestStartTime] = useState<number | null>(null);
+  const [testEndTime, setTestEndTime] = useState<number | null>(null);
+  const [siweMessage, setSiweMessage] = useState<string | null>(null);
+  const [siweSignature, setSiweSignature] = useState<string | null>(null);
+  const [score, setScore] = useState<number>(0);
+  
   const [tab, setTab] = useState("deploy");
 
   const LoaderButton = ({ ...props }) => (
@@ -38,8 +44,88 @@ function Contract() {
     </button>
   );
 
-  const { deployContract, readContract, writeContract } = usePlayground();
-  const { isConnected } = useWeb3Auth();
+  const { deployContract, readContract, writeContract, signInWithEthereum } = usePlayground();
+  const { isConnected, provider } = useWeb3Auth();
+  
+  // Charger dynamiquement le bytecode du fichier bytecode.txt
+  useEffect(() => {
+    const loadBytecode = async () => {
+      try {
+        const response = await fetch('/bytecode.txt');
+        if (response.ok) {
+          const text = await response.text();
+          const formattedBytecode = text.trim().startsWith('0x') ? text.trim() : `0x${text.trim()}`;
+          setBytecode(formattedBytecode);
+          console.log("✅ Bytecode chargé avec succès");
+        } else {
+          console.error("❌ Erreur lors du chargement du bytecode:", response.status);
+        }
+      } catch (error) {
+        console.error("❌ Erreur lors du chargement du bytecode:", error);
+      }
+    };
+    
+    loadBytecode();
+  }, []);
+  
+  // Méthode pour déployer un contrat directement avec ethers.js (implémentation des étapes 1 à 5)
+  const deployContractDirect = async () => {
+    try {
+      setLoading(true);
+      
+      // Vérifier que le provider est disponible
+      if (!provider) {
+        console.error("Provider Web3Auth non disponible, connectez-vous d'abord");
+        return;
+      }
+      
+      // Étape 2: Convertir le provider pour l'utiliser avec ethers.js
+      const ethersProvider = new BrowserProvider(provider as any);
+      const signer = await ethersProvider.getSigner();
+      
+      // Étape 3: Charger l'ABI et le Bytecode du contrat
+      let parsedAbi;
+      try {
+        // Pour gérer à la fois l'ABI déjà formaté en JSON ou en string
+        parsedAbi = typeof abi === 'string' ? JSON.parse(abi) : abi;
+      } catch (e) {
+        console.error("Erreur lors du parsing de l'ABI:", e);
+        throw new Error("ABI invalide");
+      }
+      
+      // S'assurer que le bytecode a le préfixe 0x
+      const bytecodeWithPrefix = bytecode.startsWith('0x') ? bytecode : '0x' + bytecode;
+      
+      console.log("🔄 Création de la factory de contrat...");
+      
+      // Étape 4: Créer la ContractFactory et déployer
+      const factory = new ContractFactory(parsedAbi, bytecodeWithPrefix, signer);
+      
+      console.log("🚀 Déploiement du contrat en cours...");
+      const contract = await factory.deploy(contractValue);
+      
+      console.log("⏳ Transaction envoyée, en attente de confirmation...");
+      await contract.waitForDeployment();
+      
+      // Étape 5: Récupérer et stocker l'adresse du contrat
+      const contractAddress = await contract.getAddress();
+      console.log("✅ Contrat déployé avec succès à l'adresse:", contractAddress);
+      
+      // Mettre à jour l'interface
+      setAddress(contractAddress);
+      
+      // Afficher l'adresse de l'utilisateur qui a déployé
+      const userAddress = await signer.getAddress();
+      console.log("👤 Contrat déployé par:", userAddress);
+      
+      return contract;
+    } catch (error) {
+      console.error("❌ Erreur lors du déploiement du contrat:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formDetailsDeploy = [
     {
@@ -118,18 +204,425 @@ function Contract() {
               <Tabs tabData={TabData} />
               {tab === "deploy" ? (
                 <Form formDetails={formDetailsDeploy}>
-                  <LoaderButton
-                    className="w-full mt-10 mb-0 text-center justify-center items-center flex rounded-full px-6 py-3 text-white"
-                    style={{ backgroundColor: "#0364ff" }}
-                    onClick={async () => {
-                      setLoading(true);
-                      const receipt = await deployContract(abi, bytecode, contractValue);
-                      setAddress(receipt.target);
-                      setLoading(false);
-                    }}
-                  >
-                    Deploy Contract
-                  </LoaderButton>
+                  <div className="flex flex-col space-y-4 w-full">
+                    <LoaderButton
+                      className="w-full mt-10 mb-0 text-center justify-center items-center flex rounded-full px-6 py-3 text-white"
+                      style={{ backgroundColor: "#f59e0b" }}
+                      onClick={async () => {
+                        setLoading(true);
+                        try {
+                          const { message, signature } = await signInWithEthereum();
+                          const ethersProvider = new BrowserProvider(provider as any);
+                          const signer = await ethersProvider.getSigner();
+                          const address = await signer.getAddress();
+
+                          setSiweMessage(message);
+                          setSiweSignature(signature);
+                          setAddress(address);
+                          setTestStartTime(Date.now());
+
+                          alert("✅ Test lancé à " + new Date().toLocaleTimeString());
+                        } catch (err) {
+                          console.error("Erreur SIWE:", err);
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      🔐 Lancer le test (SIWE)
+                    </LoaderButton>
+
+                    <Form
+                      formDetails={[
+                        {
+                          label: "Score obtenu (ex: 12)",
+                          input: score.toString(),
+                          onChange: (v: string) => setScore(parseInt(v)),
+                        },
+                      ]}
+                    >
+                      <LoaderButton
+                        className="w-full mt-4 mb-0 text-center justify-center items-center flex rounded-full px-6 py-3 text-white"
+                        style={{ backgroundColor: "#10b981" }}
+                        onClick={async () => {
+                          setLoading(true);
+                          try {
+                            const parsedAbi = typeof abi === 'string' ? JSON.parse(abi) : abi;
+                            const ethersProvider = new BrowserProvider(provider as any);
+                            const signer = await ethersProvider.getSigner();
+                            const userAddress = await signer.getAddress();
+                            const contract = new ethers.Contract(address, parsedAbi, signer);
+
+                            const totalQuestions = 20;
+                            
+                            // Vérification des transactions en attente
+                            const pending = await ethersProvider.getTransactionCount(userAddress, "pending");
+                            const latest = await ethersProvider.getTransactionCount(userAddress, "latest");
+                            
+                            if (pending > latest) {
+                              alert("⏳ Une transaction précédente est encore en attente. Veuillez patienter.");
+                              console.log("⏳ Transactions en attente. Attendez que la précédente soit minée !", 
+                                { pending, latest });
+                              return;
+                            }
+                            
+                            let currentNonce = latest;
+                            console.log("📊 Nonce actuel:", currentNonce);
+                            
+                            // Vérifier que l'initialisation a été faite
+                            try {
+                              // Comme c'est une démo, on initialise le test directement ici
+                              // Dans un cas réel, cela serait fait au début du test
+                              const testId = ethers.solidityPackedKeccak256(["string", "uint256"], ["test_certif", Date.now()]);
+                              const emailHash = ethers.solidityPackedKeccak256(["string"], ["utilisateur@exemple.com"]);
+                              
+                              // Créer une signature de consentement en utilisant le SIWE signature
+                              const consentSignature = siweSignature 
+                                ? ethers.toUtf8Bytes(siweSignature) 
+                                : ethers.toUtf8Bytes("Consentement signé avec SIWE");
+                              
+                              // Initialiser le test avec gas options et nonce explicite
+                              await contract.initializeTest(emailHash, testId, consentSignature, {
+                                nonce: currentNonce++,
+                                gasLimit: 150_000,
+                                maxFeePerGas: ethers.parseUnits("7", "gwei"),
+                                maxPriorityFeePerGas: ethers.parseUnits("2", "gwei"),
+                              });
+                              console.log("✅ Test initialisé avec succès, nonce utilisé:", currentNonce-1);
+                              
+                              // Attendre un moment pour éviter les conflits de nonce
+                              await new Promise((res) => setTimeout(res, 4000));
+                              
+                              // Démarrer le test avec gas options et nonce explicite
+                              await contract.startTest(totalQuestions, {
+                                nonce: currentNonce++,
+                                gasLimit: 150_000,
+                                maxFeePerGas: ethers.parseUnits("7", "gwei"),
+                                maxPriorityFeePerGas: ethers.parseUnits("2", "gwei"),
+                              });
+                              console.log("✅ Test démarré avec succès, nonce utilisé:", currentNonce-1);
+                              
+                              // Attendre que les transactions précédentes soient minées
+                              await new Promise((res) => setTimeout(res, 5000));
+                            } catch (err) {
+                              console.warn("Initialisation du test impossible (peut-être déjà fait):", err.message);
+                            }
+
+                            // Compléter le test
+                            const correctAnswers = score;
+                            const fraudScore = 0; // ou à définir plus tard
+                            const endTime = Date.now();
+                            setTestEndTime(endTime);
+                            
+                            // Construction des métadonnées avec timestamps
+                            // Capture des timestamps précis
+                          const nowExact = Math.floor(Date.now() / 1000);
+                          const startTimeSeconds = testStartTime ? Math.floor(testStartTime / 1000) : (nowExact - 300);
+                          const endTimeSeconds = nowExact;
+                          const durationSeconds = endTimeSeconds - startTimeSeconds;
+                          
+                          // Formatage des timestamps pour affichage
+                          const startFormatted = new Date(startTimeSeconds * 1000).toLocaleString("fr-FR", {
+                            timeZone: "Europe/Paris",
+                            dateStyle: "short",
+                            timeStyle: "medium"
+                          });
+                          const endFormatted = new Date(endTimeSeconds * 1000).toLocaleString("fr-FR", {
+                            timeZone: "Europe/Paris",
+                            dateStyle: "short",
+                            timeStyle: "medium"
+                          });
+                          
+                          const metadata = {
+                              startTime: startTimeSeconds,
+                              startTimeFormatted: startFormatted,
+                              endTime: endTimeSeconds,
+                              endTimeFormatted: endFormatted,
+                              duration: durationSeconds,
+                              durationFormatted: `${Math.floor(durationSeconds / 60)}m ${durationSeconds % 60}s`,
+                              siweMessage: siweMessage,
+                              siweSignature: siweSignature,
+                              passed: (score / totalQuestions) >= 0.6,
+                              score: score,
+                              totalQuestions: totalQuestions,
+                              userAddress: userAddress
+                            };
+                            
+                            // En production, on utiliserait IPFS, ici on utilise juste un JSON en local
+                            const metadataURI = "ipfs://test-metadata-placeholder";
+                            const metadataStr = JSON.stringify(metadata);
+                            console.log("📊 Métadonnées du test:", metadataStr);
+                            
+                            const passed = (score / totalQuestions) >= 0.6;
+                            
+                            // Créer une signature de consentement à partir du SIWE
+                            const consentSignature = siweSignature 
+                              ? ethers.toUtf8Bytes(siweSignature) 
+                              : ethers.toUtf8Bytes("Consentement signé avec SIWE");
+                            
+                            // Récupérer un nonce frais pour s'assurer qu'il n'y a pas de conflit
+                            const finalNonce = await ethersProvider.getTransactionCount(userAddress, "latest");
+                            console.log("📊 Nonce final pour completeTest:", finalNonce);
+                            
+                            try {
+                              // Essayer d'abord avec la version étendue
+                              console.log("🧪 Tentative d'utilisation de la version étendue de completeTest");
+                              
+                              // Création d'un testId déterministe basé sur l'adresse et le timestamp
+                              const testId = ethers.solidityPackedKeccak256(
+                                ["address", "uint256"], 
+                                [userAddress, Math.floor(testStartTime / 1000)]
+                              );
+                              
+                              // Email hash
+                              const emailHash = ethers.solidityPackedKeccak256(
+                                ["string", "address"], 
+                                ["utilisateur@exemple.com", userAddress]
+                              );
+                              
+                              // S'assurer que tous les timestamps sont en secondes et correctement formés
+                              // Utiliser le timestamp actuel précis au moment du clic
+                              const exactNow = Math.floor(Date.now() / 1000);
+                              
+                              // Pour le débogage, afficher l'heure locale
+                              const localTime = new Date(exactNow * 1000).toLocaleString("fr-FR", { 
+                                timeZone: "Europe/Paris",
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false 
+                              });
+                              console.log(`🕒 Heure exacte du clic: ${localTime} (timestamp: ${exactNow})`);
+                              
+                              // Utiliser le timestamp du début du test s'il existe (conversion ms → s)
+                              const consentTimestamp = testStartTime 
+                                ? Math.floor(testStartTime / 1000) 
+                                : exactNow - 300; // 5 minutes avant si pas de startTime
+                              
+                              // Capture de temps précise
+                              const startTime = testStartTime 
+                                ? Math.floor(testStartTime / 1000) 
+                                : consentTimestamp + 30; // 30 secondes après le consentement
+                              
+                              // Utiliser le timestamp actuel exact pour la fin
+                              const endTime = exactNow;
+                              
+                              // Afficher les conversions pour le débogage
+                              const startLocal = new Date(startTime * 1000).toLocaleString("fr-FR", { 
+                                timeZone: "Europe/Paris",
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false 
+                              });
+                              
+                              const endLocal = new Date(endTime * 1000).toLocaleString("fr-FR", { 
+                                timeZone: "Europe/Paris",
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit', 
+                                hour12: false
+                              });
+                              
+                              // Calculer correctement la durée
+                              const durationSeconds = endTime - startTime;
+                              
+                              // Calculer le score au format attendu (0-10000 = 0-100%)
+                              const calculatedScore = Math.floor((score / totalQuestions) * 10000); // Format du score attendu par le contrat
+                              
+                              console.log("📊 Timestamps validés:", {
+                                consentTimestamp,
+                                startTime, 
+                                endTime,
+                                durationSeconds,
+                                startTimeFormatted: startLocal,
+                                endTimeFormatted: endLocal, 
+                                testId: testId.toString(),
+                                emailHash: emailHash.toString()
+                              });
+                              
+                              // Vérification des valeurs avant transmission
+                              if (!testId || !emailHash) {
+                                throw new Error("ID de test ou hash d'email invalide");
+                              }
+                              
+                              // Assurer que fraudScore est un nombre entre 0-100
+                              const validatedFraudScore = Math.min(Math.max(fraudScore || 0, 0), 100);
+                              
+                              // Construction d'une string signerData avec les infos SIWE
+                              const signerData = JSON.stringify({
+                                message: siweMessage || "",
+                                signature: siweSignature || "",
+                                address: userAddress,
+                                timestamp: exactNow,
+                                localTime: localTime
+                              });
+                              
+                              console.log("📩 Envoi des données complètes au contrat:", {
+                                emailHash: emailHash.toString(),
+                                testId: testId.toString(),
+                                consentTimestamp,
+                                startTime,
+                                endTime,
+                                durationSeconds,
+                                totalQuestions,
+                                correctAnswers,
+                                calculatedScore,
+                                passed,
+                                fraudScore: validatedFraudScore
+                              });
+                              
+                              // Nouvelle méthode basée sur l'ABI mis à jour
+                              const tx = await contract.completeTest(
+                                correctAnswers,
+                                validatedFraudScore,
+                                metadataURI,
+                                BigInt(endTime), // Passez endTimeOverride comme 4ème argument
+                                {
+                                  nonce: finalNonce,
+                                  gasLimit: 250_000,
+                                  gasPrice: ethers.parseUnits("20", "gwei"), // Utiliser gasPrice directement
+                                }
+                              );
+                              console.log("🔄 Transaction étendue envoyée avec le hash:", tx.hash);
+                              await tx.wait();
+                            } catch (error) {
+                              console.warn("❌ Version étendue a échoué, tentative avec version simple:", error.message);
+                              
+                              // Vérifier si on doit récupérer un nouveau nonce
+                              const newNonce = await ethersProvider.getTransactionCount(userAddress, "latest");
+                              console.log("🔢 Nouveau nonce pour la version simple:", newNonce);
+                              
+                              // S'assurer que les types sont corrects
+                              const safeCorrectAnswers = Math.min(correctAnswers, totalQuestions);
+                              const safeFraudScore = Math.min(Math.max(fraudScore || 0, 0), 100);
+                              
+                              // Timestamp de fin (0 = utiliser block.timestamp)
+                              const endTimeSeconds = Math.floor(Date.now() / 1000);
+                              
+                              // Fallback vers la version simple completeTest avec 4 paramètres
+                              const tx = await contract.completeTest(
+                                safeCorrectAnswers, 
+                                safeFraudScore, 
+                                metadataURI, 
+                                BigInt(endTimeSeconds), // Timestamp de fin explicite
+                                {
+                                  nonce: newNonce, // Utiliser le nonce le plus récent 
+                                  gasLimit: 150_000,
+                                  gasPrice: ethers.parseUnits("25", "gwei"), // Utiliser uniquement gasPrice
+                                }
+                              );
+                              console.log("🔄 Transaction simple envoyée avec le hash:", tx.hash);
+                              await tx.wait();
+                            }
+                            
+                            // On pourrait également récupérer les informations du test depuis le contrat
+                            try {
+                              // Récupérer les données de la session de test avec la nouvelle méthode
+                              const testSession = await contract.getTestSession(userAddress);
+                              console.log("✅ Session de test récupérée:", testSession);
+                              
+                              // S'adapter au format de retour du contrat
+                              const wallet = testSession[0];
+                              const emailHash = testSession[1];
+                              const testId = testSession[2];
+                              const consentTimestamp = Number(testSession[3]);
+                              const startTime = Number(testSession[4]);
+                              const endTime = Number(testSession[5]);
+                              const duration = Number(testSession[6]);
+                              const totalQ = Number(testSession[7]);
+                              const correctA = Number(testSession[8]);
+                              const testScore = Number(testSession[9]);
+                              const testPassed = testSession[10];
+                              const testStatus = Number(testSession[11]); // enum TestStatus
+                              const fraudScore = Number(testSession[12]);
+                              const metadataURI = testSession[13];
+                              
+                              // Convertir le statut numérique en texte
+                              const statusText = ['Unset', 'Initialized', 'InProgress', 'Completed', 'Failed'][testStatus] || 'Unknown';
+                              
+                              // Formater les dates
+                              const startDate = new Date(startTime * 1000).toLocaleString();
+                              const endDate = new Date(endTime * 1000).toLocaleString();
+                              
+                              // Afficher les données de manière structurée
+                              console.log(`
+📊 TEST SUMMARY
+==============
+👤 Adresse: ${wallet}
+🆔 Test ID: 0x${testId.toString(16).substring(0, 8)}...
+⏱️ Démarré: ${startDate}
+⏱️ Terminé: ${endDate}
+⏱️ Durée: ${duration}s
+📝 Questions: ${correctA}/${totalQ} (${testScore/100}%)
+🚩 Fraude: ${fraudScore}/100
+✅ Résultat: ${testPassed ? "RÉUSSI ✅" : "ÉCHOUÉ ❌"}
+📌 Status: ${statusText}
+🔗 Métadonnées: ${metadataURI}
+                              `);
+                              
+                              // Tenter de récupérer aussi les informations de signature SIWE
+                              try {
+                                const siweData = await contract.getTestSignature(userAddress);
+                                console.log("📝 Données SIWE:", {
+                                  message: siweData[0],
+                                  signatureStart: siweData[1].slice(0, 20) + "..." // Afficher le début de la signature
+                                });
+                              } catch (err) {
+                                console.warn("⚠️ Impossible de récupérer les données SIWE:", err.message);
+                              }
+                            } catch (err) {
+                              console.warn("❌ Impossible de récupérer les informations du test:", err.message);
+                              
+                              // Essayer de vérifier d'autres données disponibles
+                              try {
+                                // Vérifier si l'utilisateur a des tests
+                                const testHistory = await contract.getUserTestHistory(userAddress);
+                                console.log("📜 Historique des tests:", testHistory);
+                                
+                                if (Number(testHistory[0]) > 0) {
+                                  console.log(`L'utilisateur a ${testHistory[0]} test(s) enregistré(s)`);
+                                } else {
+                                  console.log("⚠️ Aucun test n'a été enregistré pour cet utilisateur");
+                                }
+                              } catch (historyErr) {
+                                console.warn("❌ Impossible de récupérer l'historique des tests:", historyErr.message);
+                              }
+                            }
+
+                            alert(`📨 Résultat envoyé ! Test ${passed ? "réussi ✅" : "échoué ❌"}`);
+                            console.log(`✅ Métadonnées avec signature SIWE stockées. Résultat: ${passed ? "RÉUSSI" : "ÉCHOUÉ"} (${score}/${totalQuestions}).`);
+                          } catch (err) {
+                            console.error("Erreur envoi test:", err);
+                            alert("❌ Erreur: " + err.message);
+                          }
+                          setLoading(false);
+                        }}
+                      >
+                        ✅ Terminer le test (envoyer dans le smart contract)
+                      </LoaderButton>
+                    </Form>
+                    
+                    <LoaderButton
+                      className="w-full mt-4 mb-0 text-center justify-center items-center flex rounded-full px-6 py-3 text-white"
+                      style={{ backgroundColor: "#0364ff" }}
+                      onClick={async () => {
+                        setLoading(true);
+                        const receipt = await deployContract(abi, bytecode, contractValue);
+                        setAddress(receipt.target);
+                        setLoading(false);
+                      }}
+                    >
+                      Deploy Contract (via usePlayground)
+                    </LoaderButton>
+                    
+                    <LoaderButton
+                      className="w-full mt-4 mb-0 text-center justify-center items-center flex rounded-full px-6 py-3 text-white"
+                      style={{ backgroundColor: "#2c974b" }}
+                      onClick={deployContractDirect}
+                    >
+                      Deploy Contract Directly (via ethers.js)
+                    </LoaderButton>
+                  </div>
                 </Form>
               ) : null}
               {tab === "read" ? (

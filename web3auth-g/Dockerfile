@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json ./
 
 # Use clean npm install to ensure all dependencies are properly installed
-RUN npm install
+RUN npm install --prefix /app
 
 # Copy the rest of the application
 COPY . .

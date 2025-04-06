@@ -48,6 +48,10 @@ const Menu: React.FC = () => {
     navigate("/certifications");
   };
 
+  const handleContractClick = (): void => {
+    navigate("/contract");
+  };
+
   return (
     <div 
       style={{
@@ -90,16 +94,16 @@ const Menu: React.FC = () => {
         {isLoading ? (
           // Indicateur de chargement pendant la vérification de la connexion
           <div style={{ padding: "20px", textAlign: "center" }}>
-            <div 
-              style={{ 
-                display: "inline-block", 
-                width: "40px", 
-                height: "40px", 
-                border: "4px solid rgba(106, 152, 240, 0.3)", 
-                borderTop: "4px solid #6a98f0", 
-                borderRadius: "50%", 
-                animation: "spin 1s linear infinite" 
-              }} 
+            <div
+              style={{
+                display: "inline-block",
+                width: "40px",
+                height: "40px",
+                border: "4px solid rgba(106, 152, 240, 0.3)",
+                borderTop: "4px solid #6a98f0",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite"
+              }}
             />
             <style>{`
               @keyframes spin {
@@ -117,7 +121,7 @@ const Menu: React.FC = () => {
               fontSize: "1.2rem",
               fontWeight: "600",
               backgroundColor: "rgba(106, 152, 240, 0.1)",
-              color: "#6a98f0", 
+              color: "#6a98f0",
               border: "2px solid rgba(106, 152, 240, 0.7)",
               borderRadius: "8px",
               cursor: "pointer",
@@ -144,8 +148,8 @@ const Menu: React.FC = () => {
               e.currentTarget.style.boxShadow = "0 0 10px #6a98f0, 0 0 15px rgba(106, 152, 240, 0.4)";
             }}
           >
-            <span 
-              style={{ 
+            <span
+              style={{
                 marginRight: "10px",
                 fontSize: "1.4rem"
               }}
@@ -195,8 +199,8 @@ const Menu: React.FC = () => {
                   e.currentTarget.style.boxShadow = "0 0 10px #ff1493, 0 0 15px rgba(255, 20, 147, 0.4)";
                 }}
               >
-                <span 
-                  style={{ 
+                <span
+                  style={{
                     marginRight: "10px",
                     fontSize: "1.4rem"
                   }}
@@ -205,7 +209,7 @@ const Menu: React.FC = () => {
                 </span>
                 Certifications
               </button>
-              
+
               <button
                 onClick={handleExamsClick}
                 style={{
@@ -213,7 +217,7 @@ const Menu: React.FC = () => {
                   fontSize: "1.2rem",
                   fontWeight: "600",
                   backgroundColor: "rgba(0, 255, 0, 0.1)",
-                  color: "#00ff00", 
+                  color: "#00ff00",
                   border: "2px solid rgba(0, 255, 0, 0.7)",
                   borderRadius: "8px",
                   cursor: "pointer",
@@ -236,8 +240,8 @@ const Menu: React.FC = () => {
                   e.currentTarget.style.boxShadow = "0 0 10px #00ff00, 0 0 15px rgba(0, 255, 0, 0.4)";
                 }}
               >
-                <span 
-                  style={{ 
+                <span
+                  style={{
                     marginRight: "10px",
                     fontSize: "1.4rem"
                   }}
@@ -248,7 +252,7 @@ const Menu: React.FC = () => {
               </button>
             </div>
 
-            <div 
+            <div
               style={{
                 marginTop: "40px",
                 opacity: "0.7",
@@ -256,7 +260,7 @@ const Menu: React.FC = () => {
               }}
             >
               <p>Secured by blockchain technology</p>
-              <div 
+              <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
@@ -269,7 +273,7 @@ const Menu: React.FC = () => {
                 <span>🔒 Decentralized</span>
               </div>
             </div>
-            <div 
+            <div
               style={{
                 marginTop: "20px",
                 display: "flex",

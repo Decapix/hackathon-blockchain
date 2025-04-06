@@ -25,6 +25,7 @@
     "react-dom": "^18.3.1",
     "react-js-pagination": "^3.0.3",
     "react-json-formatter": "^0.4.0",
+    "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.26.2",
     "vite": "^5.4.8",
     "web3": "^4.13.0"

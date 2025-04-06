@@ -1,0 +1,7 @@
+node version problemes
+
+1. you need node v12.22.9 on your machine (use nvm)
+2. go to /web3auth-g
+3. npm install
+4. cd ..
+5. ./run restart-project
