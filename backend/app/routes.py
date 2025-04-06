@@ -3,6 +3,11 @@ from pydantic import BaseModel
 from typing import Optional
 from tinydb import TinyDB, Query as TinyDBQuery
 import time
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import io
+from fastapi.responses import StreamingResponse
+
 
 router = APIRouter()
 
@@ -71,3 +76,24 @@ def get_last_exam_global():
         raise HTTPException(status_code=404, detail="No exams found")
     last_exam = max(all_exams, key=lambda x: x['timestamp'])
     return last_exam
+
+
+@router.get("/last-exam-pdf")
+async def get_last_exam_pdf():
+    all_exams = ExamTable.all()
+    if not all_exams:
+        raise HTTPException(status_code=404, detail="No exams found")
+
+    last_exam = max(all_exams, key=lambda x: x['timestamp'])
+
+    # Créer un PDF avec les informations de l'examen
+    packet = io.BytesIO()
+    can = canvas.Canvas(packet, pagesize=letter)
+    can.drawString(100, 750, f"Email: {last_exam['email']}")
+    can.drawString(100, 730, f"Exam ID: {last_exam['exam_id']}")
+    can.drawString(100, 710, f"Timestamp: {last_exam['timestamp']}")
+    can.drawString(100, 690, f"Session ID: {last_exam['session_id']}")
+    can.save()
+
+    packet.seek(0)
+    return StreamingResponse(packet, media_type="application/pdf")
