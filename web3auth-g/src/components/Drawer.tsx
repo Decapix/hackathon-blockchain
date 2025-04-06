@@ -48,7 +48,7 @@ const Drawer = ({ isOpen, setOpen }: DrawerProps) => {
       <div
         onClick={() => path()}
         key={id}
-        className="flex items-center px-4 py-2 mb-2 text-gray-500 rounded-lg hover:bg-gray-100 hover:text-primary  cursor-pointer"
+        className="flex items-center px-4 py-2 mb-2 text-light-text rounded-lg hover:bg-secondary hover:text-primary transition-all duration-200 cursor-pointer"
       >
         <span className="text-sm font-normal">{label}</span>
       </div>
@@ -56,7 +56,7 @@ const Drawer = ({ isOpen, setOpen }: DrawerProps) => {
   }
   function activePage(label: string, id: number) {
     return (
-      <div key={id} className="flex items-center px-4 py-2 mb-2 rounded-lg bg-gray-100 text-primary cursor-pointer">
+      <div key={id} className="flex items-center px-4 py-2 mb-2 rounded-lg bg-secondary text-primary cursor-pointer shadow-sm">
         <span className="text-sm font-bold">{label}</span>
       </div>
     );
@@ -65,9 +65,9 @@ const Drawer = ({ isOpen, setOpen }: DrawerProps) => {
     return (
       <div className="fixed flex w-full h-full  lg:hidden">
         <div onClick={() => setOpen(false)} className="w-full h-full bg-black/[.4]"></div>
-        <div className="flex right-0 flex-col justify-between h-screen p-5 bg-white w-80">
+        <div className="flex right-0 flex-col justify-between h-screen p-5 bg-light-bg w-80 shadow-lg border-l border-secondary">
           <div className="py-2">
-            <strong className="px-4 block p-1 text-xs font-medium text-gray-400 uppercase">MENU</strong>
+            <strong className="px-4 block p-1 text-xs font-medium text-primary uppercase">MENU</strong>
             <nav className="flex flex-col mt-6">
               {location.pathname === "/" ? activePage("Main Page", 1) : linktoGo("Main Page", goToHome, 1)}
               {location.pathname === "/transaction" ? activePage("Transactions", 2) : linktoGo("Transactions", goToTransaction, 2)}
@@ -93,9 +93,9 @@ const Drawer = ({ isOpen, setOpen }: DrawerProps) => {
                   setOpen(false);
                   logout({ cleanup: true });
                 }}
-                className="flex items-center px-4 py-2 mb-2 text-gray-500 rounded-lg hover:bg-gray-100 hover:text-primary  cursor-pointer"
+                className="flex items-center px-4 py-2 mb-2 text-white rounded-lg bg-primary hover:bg-primary_hover transition-all duration-200 cursor-pointer shadow-sm"
               >
-                <span className="text-sm font-normal">Disconnect</span>
+                <span className="text-sm font-medium">Déconnexion</span>
               </div>
             </nav>
           </div>

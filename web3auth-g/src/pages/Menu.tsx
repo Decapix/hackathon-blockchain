@@ -48,17 +48,13 @@ const Menu: React.FC = () => {
   return (
     <div 
       style={{
-        backgroundImage: "url('/img.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundColor: "#121212",
+        backgroundColor: "rgba(85, 0, 50, 0.9)",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        color: "#e0e0e0",
+        color: "#333333",
         padding: "20px"
       }}
     >
@@ -66,9 +62,10 @@ const Menu: React.FC = () => {
         style={{
           maxWidth: "800px",
           width: "100%",
-          background: "linear-gradient(145deg, #1e1e1e, #2d2d2d)",
+          background: "#ffffff",
           borderRadius: "15px",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.5)",
+          boxShadow: "0 8px 32px rgba(168, 4, 100, 0.3)",
+          border: "1px solid rgba(168, 4, 100, 0.2)",
           padding: "40px",
           textAlign: "center"
         }}
@@ -76,12 +73,12 @@ const Menu: React.FC = () => {
         <h1 
           style={{ 
             marginBottom: "40px", 
-            color: "#6a98f0",
+            color: "#a80464",
             fontSize: "2.5rem",
             fontWeight: "700"
           }}
         >
-          La <span style={{ color: "#00c3ff" }}>Certif</span>
+          <span style={{color:"rgba(0,0,0,1)"}}>La</span><span style={{ color: "#a80464" }}>Certif</span>
         </h1>
         
         {!isConnected ? (
@@ -91,13 +88,13 @@ const Menu: React.FC = () => {
               padding: "16px 24px",
               fontSize: "1.2rem",
               fontWeight: "600",
-              backgroundColor: "rgba(106, 152, 240, 0.1)",
-              color: "#6a98f0", 
-              border: "2px solid rgba(106, 152, 240, 0.7)",
+              backgroundColor: "rgba(168, 4, 100, 0.1)",
+              color: "#a80464", 
+              border: "2px solid rgba(168, 4, 100, 0.7)",
               borderRadius: "8px",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              boxShadow: "0 0 10px #6a98f0, 0 0 15px rgba(106, 152, 240, 0.4)",
+              boxShadow: "0 0 10px #a80464, 0 0 15px rgba(168, 4, 100, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -109,14 +106,14 @@ const Menu: React.FC = () => {
               margin: "0 auto 20px"
             }}
             onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = "rgba(106, 152, 240, 0.2)";
+              e.currentTarget.style.backgroundColor = "rgba(168, 4, 100, 0.2)";
               e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 0 15px #6a98f0, 0 0 20px rgba(106, 152, 240, 0.6)";
+              e.currentTarget.style.boxShadow = "0 0 15px #a80464, 0 0 20px rgba(168, 4, 100, 0.6)";
             }}
             onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = "rgba(106, 152, 240, 0.1)";
+              e.currentTarget.style.backgroundColor = "rgba(168, 4, 100, 0.1)";
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 0 10px #6a98f0, 0 0 15px rgba(106, 152, 240, 0.4)";
+              e.currentTarget.style.boxShadow = "0 0 10px #a80464, 0 0 15px rgba(168, 4, 100, 0.4)";
             }}
           >
             <span 
@@ -146,81 +143,58 @@ const Menu: React.FC = () => {
                   padding: "16px 24px",
                   fontSize: "1.2rem",
                   fontWeight: "600",
-                  backgroundColor: "rgba(255, 20, 147, 0.1)",
-                  color: "#ff1493",
-                  border: "2px solid rgba(255, 20, 147, 0.7)",
+                  backgroundColor: "rgba(168, 4, 100, 0.1)",
+                  color: "#a80464",
+                  border: "2px solid rgba(168, 4, 100, 0.6)",
                   borderRadius: "8px",
                   cursor: "pointer",
                   transition: "all 0.3s ease",
-                  boxShadow: "0 0 10px #ff1493, 0 0 15px rgba(255, 20, 147, 0.4)", // Effet glow réduit
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  position: "relative",
-                  overflow: "hidden"
+                  justifyContent: "center"
                 }}
-                onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.currentTarget.style.backgroundColor = "rgba(255, 20, 147, 0.2)";
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(168, 4, 100, 0.2)";
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 0 15px #ff1493, 0 0 20px rgba(255, 20, 147, 0.6)";
                 }}
-                onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.currentTarget.style.backgroundColor = "rgba(255, 20, 147, 0.1)";
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(168, 4, 100, 0.1)";
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 0 10px #ff1493, 0 0 15px rgba(255, 20, 147, 0.4)";
                 }}
               >
-                <span 
-                  style={{ 
-                    marginRight: "10px",
-                    fontSize: "1.4rem"
-                  }}
-                >
-                  🏆
-                </span>
+                <span style={{ marginRight: "10px", fontSize: "1.4rem" }}>🏆</span>
                 Certifications
               </button>
-              
+
               <button
                 onClick={handleExamsClick}
                 style={{
                   padding: "16px 24px",
                   fontSize: "1.2rem",
                   fontWeight: "600",
-                  backgroundColor: "rgba(0, 255, 0, 0.1)",
-                  color: "#00ff00", 
-                  border: "2px solid rgba(0, 255, 0, 0.7)",
+                  backgroundColor: "rgba(66, 12, 191, 0.2)",
+                  color: "#a80464",
+                  border: "2px solid rgba(66, 12, 191, 0.6)",
                   borderRadius: "8px",
                   cursor: "pointer",
                   transition: "all 0.3s ease",
-                  boxShadow: "0 0 10px #00ff00, 0 0 15px rgba(0, 255, 0, 0.4)", // Effet glow réduit
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  position: "relative",
-                  overflow: "hidden"
+                  justifyContent: "center"
                 }}
-                onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.currentTarget.style.backgroundColor = "rgba(0, 255, 0, 0.2)";
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(66, 12, 191, 0.3)";
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 0 15px #00ff00, 0 0 20px rgba(0, 255, 0, 0.6)";
                 }}
-                onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.currentTarget.style.backgroundColor = "rgba(0, 255, 0, 0.1)";
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(66, 12, 191, 0.2)";
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 0 10px #00ff00, 0 0 15px rgba(0, 255, 0, 0.4)";
                 }}
               >
-                <span 
-                  style={{ 
-                    marginRight: "10px",
-                    fontSize: "1.4rem"
-                  }}
-                >
-                  📝
-                </span>
-                Exams
+                <span style={{ marginRight: "10px", fontSize: "1.4rem" }}>📝</span>
+                <span style={{ color: "rgba(66, 12, 191, 0.9)"}}>Exams</span>
               </button>
+
             </div>
 
             <div 

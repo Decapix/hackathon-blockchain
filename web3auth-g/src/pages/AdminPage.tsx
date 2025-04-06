@@ -18,9 +18,9 @@ function AdminPage() {
         {isConnected ? (
           <>
             <Sidebar />
-            <div className=" w-full h-full flex flex-1 flex-col bg-gray-50 items-center justify-flex-start overflow-scroll">
-              <h1 className="w-11/12 px-4 pt-16 sm:px-6 lg:px-8 text-2xl font-bold text-center sm:text-3xl">
-                Web3Auth Admin Dashboard
+            <div className="w-full h-full flex flex-1 flex-col bg-light-bg items-center justify-flex-start overflow-scroll">
+              <h1 className="w-11/12 px-4 pt-16 sm:px-6 lg:px-8 text-2xl font-bold text-center sm:text-3xl text-primary">
+                Tableau de bord administrateur
               </h1>
               <AccountDetails />
               <Console />

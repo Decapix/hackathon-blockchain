@@ -25,13 +25,13 @@ const ConnectWeb3AuthButton = () => {
           padding: "16px 24px",
           fontSize: "1.2rem",
           fontWeight: "600",
-          backgroundColor: "rgba(0, 195, 255, 0.1)",
-          color: "#00c3ff",
-          border: "2px solid rgba(0, 195, 255, 0.7)",
-          borderRadius: "8px",
+          backgroundColor: "#FF66B2",
+          color: "white",
+          border: "none",
+          borderRadius: "100px",
           cursor: "pointer",
           transition: "all 0.3s ease",
-          boxShadow: "0 0 10px #00c3ff, 0 0 15px rgba(0, 195, 255, 0.4)",
+          boxShadow: "0 4px 12px rgba(255, 102, 178, 0.3)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -40,18 +40,18 @@ const ConnectWeb3AuthButton = () => {
           minWidth: "250px"
         }}
         onMouseOver={(e) => {
-          e.currentTarget.style.backgroundColor = "rgba(0, 195, 255, 0.2)";
-          e.currentTarget.style.transform = "translateY(-2px)";
-          e.currentTarget.style.boxShadow = "0 0 15px #00c3ff, 0 0 20px rgba(0, 195, 255, 0.6)";
+          e.currentTarget.style.backgroundColor = "#FF3399";
+          e.currentTarget.style.transform = "translateY(-3px)";
+          e.currentTarget.style.boxShadow = "0 6px 16px rgba(255, 102, 178, 0.4)";
         }}
         onMouseOut={(e) => {
-          e.currentTarget.style.backgroundColor = "rgba(0, 195, 255, 0.1)";
+          e.currentTarget.style.backgroundColor = "#FF66B2";
           e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 0 10px #00c3ff, 0 0 15px rgba(0, 195, 255, 0.4)";
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(255, 102, 178, 0.3)";
         }}
       >
         <img src={web3AuthLogoWhite} style={{ height: "24px", marginRight: "10px" }} />
-        Connect to La Certif
+        Se connecter à La Certif
       </button>
     </div>
   );
