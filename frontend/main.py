@@ -186,10 +186,10 @@ if 'cheat_count' not in st.session_state:
 if 'cheated_questions' not in st.session_state:
     st.session_state.cheated_questions = set()
 if 'selected_exam' not in st.session_state:
-    st.session_state.selected_exam = "exam2"
+    st.session_state.selected_exam = "Blockchain Pro"
 
 exam = st.session_state.selected_exam
-total_questions = len(QUESTIONS[exam])
+total_questions = len(QUESTIONS[data["exam_id"]])
 
 # --- Barre de progression stylisée ---
 progress_percent = int((st.session_state.question_index / len(QUESTIONS[st.session_state.selected_exam])) * 100)
@@ -268,6 +268,8 @@ else:
             margin-top: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             animation: fadeIn 1s ease-out;
+            border-top: 4px solid #28a745;
+            border-bottom: 4px solid #28a745;
         }
         
         .success-title {
@@ -334,6 +336,8 @@ else:
             margin-top: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             animation: fadeIn 1s ease-out;
+            border-top: 4px solid #dc3545;
+            border-bottom: 4px solid #dc3545;
         }
         
         .failure-title {
@@ -416,12 +420,12 @@ if start_webcam:
 
         # Détection du regard avec style plus moderne
         if gaze.is_right() or gaze.is_left():
-            text = "⚠️ ATTENTION !"
+            text = "CHEATING!!!"
             text_color = (168, 4, 100)  # Pink color (a80464 in BGR format)
             if st.session_state.question_index not in st.session_state.cheated_questions:
                 st.session_state.cheated_questions.add(st.session_state.question_index)
         else:
-            text = "👍 Regard centré"
+            text = "Looking center"
             text_color = (50, 205, 50)  # Green
 
         # Texte plus professionnel et stylisé
