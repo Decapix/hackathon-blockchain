@@ -3,7 +3,7 @@
 
 ## Project Overview
 
-This project is a complete solution for secure, fraud-resistant online examinations with blockchain-backed certification. The platform combines:
+LaCertif is a complete solution for secure, fraud-resistant online examinations with blockchain-backed certification. The platform combines:
 
 - **Web3Auth** for secure blockchain authentication
 - **Fraud detection** using AI-powered gaze tracking
