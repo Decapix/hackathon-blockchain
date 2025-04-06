@@ -102,32 +102,33 @@ const ExamList: React.FC = () => {
       // Make API call to backend to start the exam
       const requestData = {
         email: userEmail,
-        exam_id: 1,
+        exam_id: parseInt(selectedExam)
       };
-
       console.log('Calling backend API with data:', requestData);
 
       try {
         // Try different backend URLs in sequence
         const backendUrls = [
-          'http://backend:8000/init_exam',
+          'http://localhost:8502/init_exam',      // Local development (external port is 8502)
         ];
 
         console.log('Attempting to connect to backend services...');
         let response = null;
         let lastError = null;
 
+        // Try each URL until one works
         for (const url of backendUrls) {
           try {
             console.log(`Trying backend URL: ${url}`);
             response = await axios.post(url, requestData, {
-              timeout: 5000
+              timeout: 5000 // 5 second timeout
             });
             console.log(`Successfully connected to ${url}`);
-            break;
+            break; // Break the loop if successful
           } catch (err) {
             console.log(`Failed to connect to ${url}:`, err);
             lastError = err;
+            // Continue to the next URL
           }
         }
 
@@ -141,10 +142,11 @@ const ExamList: React.FC = () => {
           throw new Error('Backend response missing session_id');
         }
 
+        // Store session info in localStorage if needed
         localStorage.setItem('examSessionId', response.data.session_id);
         localStorage.setItem('currentExam', selectedExam);
 
-        // Ouvre la session d’examen dans Streamlit
+        // Open Streamlit in a new tab
         window.open('http://localhost:8501/test', '_blank');
       } catch (axiosError) {
         throw axiosError; // Rethrow to be caught by the outer catch
