@@ -4,7 +4,7 @@ services:
   #   build: ./migrations_init
   #   env_file:
   #     - .env
-  #     - .env-supabase
+  #     - .env-example
 
   backend:
     build: ./backend
@@ -14,7 +14,7 @@ services:
       - "8502:8000"
     env_file:
       - .env
-      - .env-supabase
+      - .env-example
     networks:
       - default
 
@@ -28,7 +28,7 @@ services:
       - default
     env_file:
       - .env
-      - .env-supabase
+      - .env-example
     devices:
       - /dev/video0:/dev/video0
 
