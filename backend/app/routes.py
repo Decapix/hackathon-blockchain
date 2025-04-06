@@ -1,8 +1,7 @@
-
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query as FastAPIQuery
 from pydantic import BaseModel
 from typing import Optional
-from tinydb import TinyDB, Query
+from tinydb import TinyDB, Query as TinyDBQuery
 import time
 
 router = APIRouter()
@@ -42,7 +41,7 @@ def init_exam(request: ExamInitRequest):
 
 @router.post("/update_exam")
 def update_exam(request: ExamResultRequest):
-    Exam = Query()
+    Exam = TinyDBQuery()
     existing_exam = ExamTable.search((Exam.email == request.email) & (Exam.exam_id == request.exam_id))
     if not existing_exam:
         raise HTTPException(status_code=404, detail="Exam not found")
@@ -51,19 +50,18 @@ def update_exam(request: ExamResultRequest):
 
 @router.get("/get_last_exam/{email}")
 def get_last_exam(email: str):
-    Exam = Query()
+    Exam = TinyDBQuery()
     last_exam = sorted(ExamTable.search(Exam.email == email), key=lambda x: x['timestamp'], reverse=True)
     if not last_exam:
         raise HTTPException(status_code=404, detail="No exams found")
     return last_exam[0]
 
 @router.get("/get_result")
-def get_result(email: str, exam_id: str):
-    Exam = Query()
-    result = ExamTable.search((Exam.email == email) & (Exam.exam_id == exam_id))
-    if not result:
-        raise HTTPException(status_code=404, detail="Exam not found")
-    return result[0]
+def get_result(email: str = FastAPIQuery(None)):
+    Exam = TinyDBQuery()
+    result = ExamTable.search(Exam.email == email)
+    # Return the result (even if empty) rather than raising an error
+    return result
 
 
 @router.get("/get_last_exam_global")
