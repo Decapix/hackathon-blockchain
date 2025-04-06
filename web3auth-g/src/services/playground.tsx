@@ -41,8 +41,8 @@ export const PlaygroundContext = createContext<IPlaygroundContext>({
   chainId: null,
   playgroundConsole: "",
   chainList: chain,
-  chainListOptionSelected: "ethereum",
-  connectedChain: chain.ethereum,
+  chainListOptionSelected: "bahamut",
+  connectedChain: chain.bahamut,
   getUserInfo: async () => null,
   getPublicKey: async () => "",
   getAddress: async () => "",
@@ -74,10 +74,10 @@ export const Playground = ({ children }: IPlaygroundProps) => {
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [chainList, setChainDetails] = useState(chain);
-  const [chainListOptionSelected, setChainListOptionSelected] = useState("ethereum");
+  const [chainListOptionSelected, setChainListOptionSelected] = useState("bahamut");
   const [chainId, setChainId] = useState<any>(null);
   const [playgroundConsole, setPlaygroundConsole] = useState<string>("");
-  const [connectedChain, setConnectedChain] = useState<CustomChainConfig>(chain.ethereum);
+  const [connectedChain, setConnectedChain] = useState<CustomChainConfig>(chain.bahamut);
   const uiConsole = (...args: unknown[]) => {
     setPlaygroundConsole(`${JSON.stringify(args || {}, null, 2)}\n\n\n\n${playgroundConsole}`);
     console.log(...args);
