@@ -132,11 +132,32 @@ if st.session_state.question_index < total_questions:
             st.session_state.question_index += 1
             st.rerun()
 else:
+    # envoyer un call api au end point /update_exam
+    API_URL = "http://backend:8000/update_exam"
+    
     correct_answers = [q["correct_answer"] for q in QUESTIONS[exam]]
-    score = sum(1 for user_answer, correct_answer in zip(st.session_state.user_answers, correct_answers) if user_answer == correct_answer)
-    st.success(f"✅ Vous avez terminé toutes les questions ! Votre score est de {score}/{total_questions}.")
-    cheat_percentage = (len(st.session_state.cheated_questions) / total_questions) * 100
-    st.warning(f"⚠️ Vous avez été détecté en train de tricher {cheat_percentage:.2f}% du temps.")
+    score = sum(1 for user_answer, correct_answer in zip(st.session_state.user_answers, correct_answers) if user_answer == correct_answer) / total_questions
+    cheat_percentage = (len(st.session_state.cheated_questions) / total_questions)
+    passed = score >= 0.6 and cheat_percentage < 0.2
+
+    # Make API call to backend to update the exam
+    response = requests.post(API_URL, json={
+        "email": data["email"],
+        "exam_id": data["exam_id"],
+        "score": score,
+        "cheat_score": cheat_percentage,
+        "passed": passed,
+        "details": {
+            "total_questions": total_questions,
+            "user_answers": st.session_state.user_answers,
+            "cheated_questions": list(st.session_state.cheated_questions)
+        }
+    })
+    response.raise_for_status()
+
+    st.success(f"✅ Vous avez terminé toutes les questions ! Votre score est de {score * 100:.2f}.")
+    if cheat_percentage > 0:
+        st.warning(f"⚠️ Vous avez été détecté en train de tricher {cheat_percentage * 100:.2f}% du temps.")
 
 
 # --- Webcam dans la sidebar ---

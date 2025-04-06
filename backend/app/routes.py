@@ -19,7 +19,7 @@ class ExamSession(BaseModel):
 class ExamResultRequest(BaseModel):
     email: str
     exam_id: str
-    score: int
+    score: float
     cheat_score: float
     passed: bool
     details: Optional[dict] = None
