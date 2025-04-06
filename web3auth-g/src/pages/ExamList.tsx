@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import examData from "../question.json";
 import "../App.css";
+import { usePlayground } from "../services/playground";
+import { deployTestEvaluator, initializeTest, startTest } from "../services/testEvaluator";
 
 interface StyleProps {
   [key: string]: string | number | StyleProps;
@@ -10,7 +12,11 @@ interface StyleProps {
 const ExamList: React.FC = () => {
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [exams, setExams] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const navigate = useNavigate();
+  const { provider, uiConsole } = usePlayground();
 
   useEffect(() => {
     // Load the exam data from question.json
@@ -21,11 +27,34 @@ const ExamList: React.FC = () => {
     setSelectedExam(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleStartExam = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedExam) {
-      console.log(`Selected exam: ${selectedExam}`);
-      // navigate(`/exam/${selectedExam}`);
+    if (selectedExam && provider) {
+      try {
+        setLoading(true);
+        setError("");
+        setSuccess("");
+        
+        // Step 2: Initialize the test with user data
+        const userEmail = "student@example.com"; // In a real app, get this from the user
+        const consentText = "I consent to take this exam and have my results stored on blockchain";
+        
+        await initializeTest(provider, uiConsole, userEmail, selectedExam, consentText);
+        
+        // Step 3: Start the test with number of questions
+        await startTest(provider, uiConsole, 10); // Assuming 10 questions
+        
+        setSuccess(`Successfully initialized and started exam "${selectedExam}" on blockchain`);
+        console.log(`Selected exam: ${selectedExam}`);
+        
+        // Uncomment to navigate to exam page
+        // navigate(`/exam/${selectedExam}`);
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message || "Failed to start exam on blockchain");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -68,6 +97,32 @@ const ExamList: React.FC = () => {
           List of <span style={{ color: "#00c3ff" }}>Exams</span>
         </h1>
         
+        {error && (
+          <div style={{
+            marginBottom: "20px",
+            padding: "15px",
+            backgroundColor: "rgba(255, 87, 87, 0.1)",
+            border: "1px solid #ff5757",
+            borderRadius: "10px",
+            color: "#ff5757"
+          } as React.CSSProperties}>
+            <p style={{ margin: 0 }}>{error}</p>
+          </div>
+        )}
+        
+        {success && (
+          <div style={{
+            marginBottom: "20px",
+            padding: "15px",
+            backgroundColor: "rgba(46, 213, 115, 0.1)",
+            border: "1px solid #2ed573",
+            borderRadius: "10px",
+            color: "#2ed573"
+          } as React.CSSProperties}>
+            <p style={{ margin: 0 }}>{success}</p>
+          </div>
+        )}
+        
         <div
           style={{
             marginBottom: "30px",
@@ -80,7 +135,7 @@ const ExamList: React.FC = () => {
             Select an exam to start your evaluation.
           </p>
           
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleStartExam}>
             <div
               style={{
                 marginBottom: "20px",
@@ -157,44 +212,58 @@ const ExamList: React.FC = () => {
               
               <button 
                 type="submit" 
-                disabled={!selectedExam}
+                disabled={!selectedExam || loading}
                 style={{
                   padding: "12px 20px",
                   fontSize: "1rem",
                   fontWeight: "600",
-                  backgroundColor: selectedExam ? "#00c3ff" : "#2a2d3e",
+                  backgroundColor: (selectedExam && !loading) ? "#00c3ff" : "#2a2d3e",
                   color: "#ffffff",
                   border: "none",
                   borderRadius: "8px",
-                  cursor: selectedExam ? "pointer" : "not-allowed",
+                  cursor: (selectedExam && !loading) ? "pointer" : "not-allowed",
                   transition: "all 0.3s ease",
-                  boxShadow: selectedExam ? "0 0 10px rgba(0, 195, 255, 0.4)" : "none",
-                  opacity: selectedExam ? "1" : "0.6"
+                  boxShadow: (selectedExam && !loading) ? "0 0 10px rgba(0, 195, 255, 0.4)" : "none",
+                  opacity: (selectedExam && !loading) ? "1" : "0.6",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
                 } as React.CSSProperties}
                 onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  if(selectedExam) {
+                  if(selectedExam && !loading) {
                     e.currentTarget.style.backgroundColor = "#33ceff";
                     e.currentTarget.style.transform = "translateY(-2px)";
                     e.currentTarget.style.boxShadow = "0 0 15px rgba(0, 195, 255, 0.5)";
                   }
                 }}
                 onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  if(selectedExam) {
+                  if(selectedExam && !loading) {
                     e.currentTarget.style.backgroundColor = "#00c3ff";
                     e.currentTarget.style.transform = "translateY(0)";
                     e.currentTarget.style.boxShadow = "0 0 10px rgba(0, 195, 255, 0.4)";
                   }
                 }}
               >
-                <span 
-                  style={{ 
-                    marginRight: "10px",
-                    fontSize: "1.1rem"
-                  } as React.CSSProperties}
-                >
-                  📝
-                </span>
-                Start Exam
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Initializing on Blockchain...
+                  </>
+                ) : (
+                  <>
+                    <span style={{ marginRight: "10px", fontSize: "1.1rem" }}>
+                      🔗
+                    </span>
+                    Start Blockchain Exam
+                  </>
+                )}
               </button>
             </div>
           </form>
