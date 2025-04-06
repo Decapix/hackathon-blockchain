@@ -104,20 +104,38 @@ const ethersWeb3Provider = (
     initValue: string
   ): Promise<any> => {
     try {
+      // ✅ Créer le provider et le signer
       const ethersProvider = new ethers.BrowserProvider(provider as any);
       const signer = await ethersProvider.getSigner();
-      const factory = new ContractFactory(JSON.parse(contractABI), contractByteCode, signer);
-
+      
+      // Assurer que l'ABI est un objet
+      const parsedABI = typeof contractABI === 'string' ? JSON.parse(contractABI) : contractABI;
+      
+      // Assurer que le bytecode a le préfixe 0x
+      const formattedBytecode = contractByteCode.startsWith('0x') ? contractByteCode : `0x${contractByteCode}`;
+      
+      // ✅ Créer la ContractFactory
+      const factory = new ContractFactory(parsedABI, formattedBytecode, signer);
+      
+      // ✅ Déployer le contrat
       const contract = await factory.deploy(initValue);
-      uiConsole("Contract:", contract);
-      uiConsole(`Deploying Contract at Target: ${contract.target}, waiting for confirmation...`);
-
-      const receipt = await contract.waitForDeployment();
-      uiConsole("Contract Deployed. Receipt:", receipt);
-
-      return receipt;
+      uiConsole("🚀 Déploiement du contrat en cours...");
+      uiConsole(`⏳ Transaction envoyée au: ${contract.target}, en attente de confirmation...`);
+      
+      // ✅ Attendre que le contrat soit réellement déployé
+      await contract.waitForDeployment();
+      
+      const address = await contract.getAddress();
+      uiConsole("✅ Contrat déployé avec succès à:", address);
+      
+      // Informations supplémentaires
+      const userAddress = await signer.getAddress();
+      uiConsole("👤 Déployé par:", userAddress);
+      
+      // ✅ Retourner l'objet contract
+      return contract;
     } catch (error: any) {
-      uiConsole(error);
+      uiConsole("❌ Erreur lors du déploiement:", error);
       return error.toString();
     }
   };
@@ -129,12 +147,39 @@ const ethersWeb3Provider = (
     try {
       const ethersProvider = new ethers.BrowserProvider(provider as any);
       const signer = await ethersProvider.getSigner();
-      const contract = new ethers.Contract(contractAddress, JSON.parse(contractABI), signer);
-
-      const message = await contract.message();
-      return message;
+      
+      // Assurer que l'ABI est un objet
+      const parsedABI = typeof contractABI === 'string' ? JSON.parse(contractABI) : contractABI;
+      
+      // Créer l'instance du contrat
+      const contract = new ethers.Contract(contractAddress, parsedABI, signer);
+      
+      // Récupérer l'adresse de l'utilisateur
+      const userAddress = await signer.getAddress();
+      
+      try {
+        // ✅ Essayer d'abord d'appeler getTestStatus si c'est un contrat TestEvaluator
+        const result = await contract.getTestStatus(userAddress);
+        uiConsole("📊 Statut du test:", result);
+        return result;
+      } catch (e) {
+        // Si getTestStatus n'existe pas, essayer message() pour la compatibilité
+        try {
+          const message = await contract.message();
+          uiConsole("📄 Message:", message);
+          return message;
+        } catch (innerError) {
+          // Si message() n'existe pas, tenter de lire une autre fonction (supposée publique)
+          uiConsole("ℹ️ Les fonctions getTestStatus et message n'existent pas sur ce contrat");
+          
+          // Retourner une description des fonctions disponibles
+          const functions = Object.keys(contract.interface.functions);
+          uiConsole("🔍 Fonctions disponibles:", functions);
+          return `Contrat trouvé à ${contractAddress}, fonctions disponibles: ${functions.join(", ")}`;
+        }
+      }
     } catch (error: any) {
-      uiConsole(error);
+      uiConsole("❌ Erreur lors de la lecture du contrat:", error);
       return error.toString();
     }
   };
@@ -147,13 +192,51 @@ const ethersWeb3Provider = (
     try {
       const ethersProvider = new ethers.BrowserProvider(provider as any);
       const signer = await ethersProvider.getSigner();
-      const contract = new ethers.Contract(contractAddress, JSON.parse(JSON.stringify(contractABI)), signer);
-
-      const tx = await contract.update(updatedValue);
+      
+      // Assurer que l'ABI est un objet
+      const parsedABI = typeof contractABI === 'string' ? JSON.parse(contractABI) : contractABI;
+      
+      // Créer l'instance du contrat
+      const contract = new ethers.Contract(contractAddress, parsedABI, signer);
+      
+      let tx;
+      
+      try {
+        // ✅ Essayer d'abord d'appeler completeTest si c'est un contrat TestEvaluator
+        uiConsole("🔄 Tentative d'appel de completeTest...");
+        tx = await contract.completeTest(
+          10,             // correctAnswers (10 sur 20)
+          5,              // fraudScore (0-100)
+          updatedValue    // metadataURI
+        );
+      } catch (e) {
+        // Si completeTest n'existe pas, essayer update() pour la compatibilité
+        try {
+          uiConsole("🔄 Tentative d'appel de update...");
+          tx = await contract.update(updatedValue);
+        } catch (innerError) {
+          // Si aucune fonction n'existe, essayer la première fonction d'écriture disponible
+          const writableFunctions = Object.values(contract.interface.functions)
+            .filter(fn => !fn.constant && fn.inputs.length > 0)
+            .map(fn => fn.name);
+          
+          if (writableFunctions.length > 0) {
+            const firstMethod = writableFunctions[0];
+            uiConsole(`🔄 Tentative d'appel de ${firstMethod}...`);
+            tx = await contract[firstMethod](updatedValue);
+          } else {
+            throw new Error("Aucune fonction d'écriture disponible sur ce contrat");
+          }
+        }
+      }
+      
+      uiConsole("⏳ Transaction envoyée, en attente de confirmation...");
       const receipt = await tx.wait();
+      uiConsole("✅ Transaction confirmée:", receipt.hash);
+      
       return receipt;
     } catch (error: any) {
-      uiConsole(error);
+      uiConsole("❌ Erreur lors de l'écriture dans le contrat:", error);
       return error.toString();
     }
   };

@@ -1,5 +1,64 @@
 [
 	{
+		"inputs": [
+			{
+				"internalType": "uint16",
+				"name": "correctAnswers",
+				"type": "uint16"
+			},
+			{
+				"internalType": "uint8",
+				"name": "fraudScore",
+				"type": "uint8"
+			},
+			{
+				"internalType": "string",
+				"name": "metadataURI",
+				"type": "string"
+			}
+		],
+		"name": "completeTest",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "emailHash",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "testId",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "consentHash",
+				"type": "bytes32"
+			}
+		],
+		"name": "initializeTest",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint16",
+				"name": "totalQuestions",
+				"type": "uint16"
+			}
+		],
+		"name": "startTest",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -61,29 +120,6 @@
 		],
 		"name": "TestStarted",
 		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint16",
-				"name": "correctAnswers",
-				"type": "uint16"
-			},
-			{
-				"internalType": "uint8",
-				"name": "fraudScore",
-				"type": "uint8"
-			},
-			{
-				"internalType": "string",
-				"name": "metadataURI",
-				"type": "string"
-			}
-		],
-		"name": "completeTest",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	},
 	{
 		"inputs": [
@@ -171,42 +207,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes32",
-				"name": "emailHash",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "testId",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "consentHash",
-				"type": "bytes32"
-			}
-		],
-		"name": "initializeTest",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint16",
-				"name": "totalQuestions",
-				"type": "uint16"
-			}
-		],
-		"name": "startTest",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]
