@@ -151,7 +151,7 @@ const ExamList: React.FC = () => {
         localStorage.setItem('currentExam', selectedExam);
 
         // Open Streamlit in a new tab
-        window.open('http://localhost:8501/test', '_blank');
+        window.open('http://localhost:8501/', '_blank');
 
         // Redirection vers la page Menu après 1 seconde
         setTimeout(() => {
