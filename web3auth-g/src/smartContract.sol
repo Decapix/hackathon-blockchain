@@ -2,146 +2,254 @@
 pragma solidity ^0.8.0;
 
 contract TestEvaluator {
-    enum TestStatusEnum { Unset, Initialized, InProgress, Completed }
+    enum TestStatus { Unset, Initialized, InProgress, Completed, Failed }
 
-    struct TestData {
+    // Structure complète de la session de test
+    struct TestSession {
+        // Identifiants et informations générales
+        address wallet;
         bytes32 emailHash;
         bytes32 testId;
-        bytes32 consentHash;
+        
+        // Consentement et signature
+        bytes consentSignature;
+        uint64 consentTimestamp;
+        
+        // Temps et durée
         uint64 startTime;
         uint64 endTime;
+        uint32 durationSeconds;
+        
+        // Informations du test et résultats
         uint16 totalQuestions;
         uint16 correctAnswers;
+        uint16 score;     // Sur 10000 (100.00%)
+        bool passed;
+        
+        // Statut et métadonnées
+        TestStatus status;
         uint8 fraudScore;
         string metadataURI;
+        
+        // Données SIWE (Sign-In With Ethereum)
+        string siweMessage;
+        bytes siweSignature;
     }
 
-    struct TestStatus {
-        address wallet;
-        uint16 score;
-        bool passed;
-        TestStatusEnum status;
-        uint32 durationSeconds;
-    }
+    // Mappings pour stocker les tests
+    mapping(address => TestSession) public testSessions;
+    mapping(bytes32 => address) public testIdToAddress;
+    mapping(address => bytes32[]) public userTestHistory;
 
-    mapping(address => TestData) private _testData;
-    mapping(address => TestStatus) private _testStatus;
+    // Événements
+    event TestInitialized(address indexed user, bytes32 testId, uint64 timestamp);
+    event TestStarted(address indexed user, bytes32 testId, uint64 timestamp, uint16 totalQuestions);
+    event TestCompleted(
+        address indexed user, 
+        bytes32 testId, 
+        uint16 score, 
+        bool passed, 
+        uint64 startTime,
+        uint64 endTime, 
+        uint32 duration
+    );
 
-    event TestInitialized(address indexed user, bytes32 testId);
-    event TestStarted(address indexed user, bytes32 testId);
-    event TestCompleted(address indexed user, bytes32 testId, uint16 score);
-
-    // Initialisation sans frais de gaz
+    /**
+     * @dev Initialise un nouveau test avec les informations de base
+     * @param emailHash Hash de l'email du candidat (bytes32)
+     * @param testId Identifiant unique du test (bytes32)
+     * @param consentSignature Signature du message de consentement (SIWE) 
+     * @param siweMessage Message SIWE complet (optionnel)
+     */
     function initializeTest(
         bytes32 emailHash,
         bytes32 testId,
-        bytes32 consentHash
+        bytes calldata consentSignature,
+        string calldata siweMessage
     ) external {
-        _testData[msg.sender] = TestData({
-            emailHash: emailHash,
-            testId: testId,
-            consentHash: consentHash,
-            startTime: 0,
-            endTime: 0,
-            totalQuestions: 0,
-            correctAnswers: 0,
-            fraudScore: 0,
-            metadataURI: ""
-        });
+        require(testSessions[msg.sender].status == TestStatus.Unset, "Test already exists for this address");
 
-        _testStatus[msg.sender] = TestStatus({
-            wallet: msg.sender,
-            score: 0,
-            passed: false,
-            status: TestStatusEnum.Initialized,
-            durationSeconds: 0
-        });
+        // Initialisation de la session de test
+        TestSession storage session = testSessions[msg.sender];
+        
+        // Identifiants
+        session.wallet = msg.sender;
+        session.emailHash = emailHash;
+        session.testId = testId;
+        
+        // Consentement
+        session.consentSignature = consentSignature;
+        session.consentTimestamp = uint64(block.timestamp);
+        
+        // Initialisation des temps
+        session.startTime = 0;
+        session.endTime = 0;
+        session.durationSeconds = 0;
+        
+        // Initialisation du statut et des résultats
+        session.totalQuestions = 0;
+        session.correctAnswers = 0;
+        session.score = 0;
+        session.passed = false;
+        session.status = TestStatus.Initialized;
+        session.fraudScore = 0;
+        session.metadataURI = "";
+        
+        // Données SIWE
+        session.siweMessage = siweMessage;
+        session.siweSignature = consentSignature;
 
-        emit TestInitialized(msg.sender, testId);
+        // Associations pour faciliter les recherches
+        testIdToAddress[testId] = msg.sender;
+        userTestHistory[msg.sender].push(testId);
+
+        emit TestInitialized(msg.sender, testId, session.consentTimestamp);
     }
 
-    // Démarrage sans frais de gaz
+    /**
+     * @dev Démarre un test déjà initialisé
+     * @param totalQuestions Nombre total de questions du test
+     * @param startTimeOverride Timestamp de début personnalisé (0 pour utiliser block.timestamp)
+     */
     function startTest(
-        uint16 totalQuestions
+        uint16 totalQuestions,
+        uint64 startTimeOverride
     ) external {
-        TestData storage data = _testData[msg.sender];
-        TestStatus storage status = _testStatus[msg.sender];
+        TestSession storage session = testSessions[msg.sender];
+        
+        require(session.status == TestStatus.Initialized, "Test not initialized or already started");
+        require(totalQuestions > 0, "Number of questions must be greater than 0");
 
-        require(status.status == TestStatusEnum.Initialized, "Invalid status");
+        // Mise à jour des informations du test
+        session.startTime = startTimeOverride > 0 ? startTimeOverride : uint64(block.timestamp);
+        session.totalQuestions = totalQuestions;
+        session.status = TestStatus.InProgress;
 
-        data.startTime = uint64(block.timestamp);
-        data.totalQuestions = totalQuestions;
-        status.status = TestStatusEnum.InProgress;
-
-        emit TestStarted(msg.sender, data.testId);
+        emit TestStarted(msg.sender, session.testId, session.startTime, totalQuestions);
     }
 
-    // Finalisation sans frais de gaz
+    /**
+     * @dev Complète un test en cours
+     * @param correctAnswers Nombre de réponses correctes
+     * @param fraudScore Score de fraude (0-100)
+     * @param metadataURI URI des métadonnées du test (IPFS ou autre)
+     * @param endTimeOverride Timestamp de fin personnalisé (0 pour utiliser block.timestamp)
+     */
     function completeTest(
         uint16 correctAnswers,
         uint8 fraudScore,
-        string calldata metadataURI
+        string calldata metadataURI,
+        uint64 endTimeOverride
     ) external {
-        TestData storage data = _testData[msg.sender];
-        TestStatus storage status = _testStatus[msg.sender];
-
-        require(status.status == TestStatusEnum.InProgress, "Invalid status");
-
-        data.endTime = uint64(block.timestamp);
-        data.correctAnswers = correctAnswers;
-        data.fraudScore = fraudScore;
-        data.metadataURI = metadataURI;
-
-        status.durationSeconds = uint32(data.endTime - data.startTime);
-        status.score = _calculateScore(correctAnswers, data.totalQuestions);
-        status.passed = (status.score >= 7500); // 75% pour réussir
-        status.status = TestStatusEnum.Completed;
-
-        emit TestCompleted(msg.sender, data.testId, status.score);
+        TestSession storage session = testSessions[msg.sender];
+        
+        require(session.status == TestStatus.InProgress, "Test not in progress");
+        require(correctAnswers <= session.totalQuestions, "Correct answers cannot exceed total questions");
+        
+        // Mise à jour des temps
+        session.endTime = endTimeOverride > 0 ? endTimeOverride : uint64(block.timestamp);
+        session.durationSeconds = uint32(session.endTime - session.startTime);
+        
+        // Mise à jour des résultats
+        session.correctAnswers = correctAnswers;
+        session.fraudScore = fraudScore;
+        session.metadataURI = metadataURI;
+        
+        // Calcul du score et du résultat
+        session.score = _calculateScore(correctAnswers, session.totalQuestions);
+        session.passed = (session.score >= 6000); // 60% pour réussir
+        session.status = TestStatus.Completed;
+        
+        emit TestCompleted(
+            msg.sender, 
+            session.testId, 
+            session.score, 
+            session.passed, 
+            session.startTime,
+            session.endTime,
+            session.durationSeconds
+        );
     }
 
-    // Calcul du score
-    function _calculateScore(uint16 correct, uint16 total) private pure returns (uint16) {
-        return total > 0 ? uint16((correct * 10000) / total) : 0;
-    }
-
-    // Nouvelle fonction pour obtenir les informations de TestData
-    function getTestData(address user) public view returns (
+    /**
+     * @dev Permet de récupérer toutes les informations d'une session de test
+     * @param user Adresse du wallet du candidat
+     * @return La session de test complète
+     */
+    function getTestSession(address user) public view returns (
+        address wallet,
+        bytes32 emailHash,
         bytes32 testId,
+        uint64 consentTimestamp,
         uint64 startTime,
         uint64 endTime,
+        uint32 durationSeconds,
         uint16 totalQuestions,
         uint16 correctAnswers,
+        uint16 score,
+        bool passed,
+        TestStatus status,
         uint8 fraudScore,
         string memory metadataURI
     ) {
-        TestData memory data = _testData[user];
+        TestSession memory session = testSessions[user];
         return (
-            data.testId,
-            data.startTime,
-            data.endTime,
-            data.totalQuestions,
-            data.correctAnswers,
-            data.fraudScore,
-            data.metadataURI
+            session.wallet,
+            session.emailHash,
+            session.testId,
+            session.consentTimestamp,
+            session.startTime,
+            session.endTime,
+            session.durationSeconds,
+            session.totalQuestions,
+            session.correctAnswers,
+            session.score,
+            session.passed,
+            session.status,
+            session.fraudScore,
+            session.metadataURI
+        );
+    }
+    
+    /**
+     * @dev Permet de récupérer la signature SIWE d'une session de test
+     * @param user Adresse du wallet du candidat
+     * @return Le message SIWE et la signature
+     */
+    function getTestSignature(address user) public view returns (
+        string memory siweMessage,
+        bytes memory siweSignature
+    ) {
+        TestSession memory session = testSessions[user];
+        return (
+            session.siweMessage,
+            session.siweSignature
+        );
+    }
+    
+    /**
+     * @dev Permet d'obtenir l'historique des tests d'un utilisateur
+     * @param user Adresse du wallet du candidat
+     * @return Le nombre de tests et la liste des identifiants
+     */
+    function getUserTestHistory(address user) public view returns (
+        uint256 testCount,
+        bytes32[] memory testIds
+    ) {
+        bytes32[] memory ids = userTestHistory[user];
+        return (
+            ids.length,
+            ids
         );
     }
 
-    // Nouvelle fonction pour obtenir les informations de TestStatus
-    function getTestStatus(address user) public view returns (
-        address wallet,
-        uint16 score,
-        bool passed,
-        TestStatusEnum status,
-        uint32 durationSeconds
-    ) {
-        TestStatus memory statusInfo = _testStatus[user];
-        return (
-            statusInfo.wallet,
-            statusInfo.score,
-            statusInfo.passed,
-            statusInfo.status,
-            statusInfo.durationSeconds
-        );
+    /**
+     * @dev Calcule le score en pourcentage (0-10000 pour 0-100%)
+     * @param correct Nombre de réponses correctes
+     * @param total Nombre total de questions
+     * @return score Score en pourcentage (multiplié par 100)
+     */
+    function _calculateScore(uint16 correct, uint16 total) private pure returns (uint16) {
+        return total > 0 ? uint16((correct * 10000) / total) : 0;
     }
 }
