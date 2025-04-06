@@ -5,7 +5,7 @@ import requests
 from GazeTracking.gaze_tracking import GazeTracking
 from questions import QUESTIONS
 
-API_URL = "http://backend:8000/get_last_exam"
+API_URL = "http://backend:8000/get_last_exam_global"
 
 st.write("Dernier examen enregistré")
 
