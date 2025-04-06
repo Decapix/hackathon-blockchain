@@ -2,6 +2,16 @@
 
 
 
+clone_gaze_tracking() {
+    # Vérifie si le dossier frontend/GazeTracking existe
+    if [ ! -d "frontend/GazeTracking" ]; then
+        echo "Le dossier frontend/GazeTracking n'existe pas. Clonage en cours..."
+        git clone https://github.com/antoinelame/GazeTracking frontend/GazeTracking
+        echo "Clonage terminé."
+    else
+        echo "Le dossier frontend/GazeTracking existe déjà."
+    fi
+}
 
 
 # Function to build and start project services
@@ -15,21 +25,20 @@ start_project_services() {
 
 # Function to start the services in production mode
 start_services_prod() {
-
+    clone_gaze_tracking
     start_project_services
-
 }
 
 # Function to start the services in development mode
 start_services_dev() {
-es
+    clone_gaze_tracking
     echo "Starting the docker-compose-project.yaml in attached mode..."
     docker compose -f docker-compose-project.yaml up
 }
 
 # Function to restart the docker-compose-project
 restart_project() {
-
+    clone_gaze_tracking
     echo "Restarting the docker-compose-project.yaml..."
     docker compose -f docker-compose-project.yaml down
     docker compose -f docker-compose-project.yaml build
