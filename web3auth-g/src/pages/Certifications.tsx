@@ -194,6 +194,30 @@ const Certifications: React.FC = () => {
     setZoomedQR(null);
   };
 
+  // Nouvelle fonction pour générer et télécharger un PDF vide
+  const downloadEmptyPDF = (): void => {
+    // Création d'un élément temporaire pour le téléchargement
+    const link = document.createElement('a');
+    
+    // URL du PDF vide (un blob vide avec le type MIME pour PDF)
+    const file = new Blob([' '], { type: 'application/pdf' });
+    
+    // Création d'une URL object pour le blob
+    const fileURL = URL.createObjectURL(file);
+    
+    // Configuration de l'élément pour le téléchargement
+    link.href = fileURL;
+    link.download = `certification-${zoomedQR}.pdf`;
+    
+    // Ajout temporaire au DOM pour déclencher le téléchargement
+    document.body.appendChild(link);
+    link.click();
+    
+    // Nettoyage
+    document.body.removeChild(link);
+    URL.revokeObjectURL(fileURL);
+  };
+
   return (
     <div
       style={{
@@ -396,20 +420,36 @@ const Certifications: React.FC = () => {
             <p style={{ color: "#121212", fontSize: "16px", textAlign: "center" }}>
               {zoomedQR}
             </p>
-            <button
-              onClick={closeZoomedQR}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#a80464",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontWeight: "bold"
-              }}
-            >
-              Close
-            </button>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                onClick={closeZoomedQR}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#a80464",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontWeight: "bold"
+                }}
+              >
+                Close
+              </button>
+              <button
+                onClick={downloadEmptyPDF}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontWeight: "bold"
+                }}
+              >
+                Télécharger PDF
+              </button>
+            </div>
           </div>
         </div>
       )}
