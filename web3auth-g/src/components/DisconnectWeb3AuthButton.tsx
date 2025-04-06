@@ -9,12 +9,11 @@ const DisconnectWeb3AuthButton = () => {
   if (isConnected) {
     return (
       <div
-        className="flex flex-row rounded-full px-6 py-3 text-white justify-center align-center cursor-pointer"
-        style={{ backgroundColor: "#0364ff" }}
+        className="flex flex-row rounded-full px-6 py-3 text-white justify-center items-center cursor-pointer shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+        style={{ backgroundColor: "#FF66B2" }}
         onClick={() => logout()}
       >
-        <img src={web3AuthLogoWhite} className="headerLogo" />
-        Disconnect
+        <span className="font-medium">Deconnect</span>
       </div>
     );
   }

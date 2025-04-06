@@ -44,7 +44,7 @@ const Sidebar = () => {
       <div
         onClick={() => path()}
         key={id}
-        className="flex items-center px-4 py-2 mb-2 text-gray-500 rounded-lg hover:bg-gray-100 hover:text-primary  cursor-pointer"
+        className="flex items-center px-4 py-2 mb-2 text-light-text rounded-lg hover:bg-secondary hover:text-primary transition-all duration-200 cursor-pointer"
       >
         <span className="text-sm font-normal">{label}</span>
       </div>
@@ -52,16 +52,16 @@ const Sidebar = () => {
   }
   function activePage(label: string, id: number) {
     return (
-      <div key={id} className="flex items-center px-4 py-2 mb-2 rounded-lg bg-gray-100 text-primary cursor-pointer">
+      <div key={id} className="flex items-center px-4 py-2 mb-2 rounded-lg bg-secondary text-primary cursor-pointer shadow-sm">
         <span className="text-sm font-bold">{label}</span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col justify-between h-screen bg-white border-r w-64 p-5 lg:flex hidden">
+    <div className="flex flex-col justify-between h-screen bg-light-bg border-r border-secondary w-64 p-5 lg:flex hidden shadow-sm">
       <div className="py-3">
-        <strong className="px-4 block p-1 text-xs font-medium text-gray-400 uppercase">MENU</strong>
+        <strong className="px-4 block p-1 text-xs font-medium text-primary uppercase">MENU</strong>
         <nav className="flex flex-col mt-6">
           {location.pathname === "/" ? activePage("Main Page", 1) : linktoGo("Main Page", goToHome, 1)}
           {location.pathname === "/transaction" ? activePage("Signing/ Transaction", 2) : linktoGo("Signing/ Transaction", goToTransaction, 2)}

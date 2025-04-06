@@ -9,6 +9,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #FCFCFC;
+  color: #333333;
 }
 
 code {
@@ -18,15 +20,20 @@ code {
 
 .sidebarHeading {
   font-size: 1.2rem;
-  color: #808080;
-  font-weight: 500;
+  color: #555555;
+  font-weight: 600;
   margin-bottom: 2rem;
 }
 
 .sidebarButton {
   font-size: 1rem;
-  color: #808080;
+  color: #666666;
   font-weight: 400;
+  transition: all 0.2s ease;
+}
+
+.sidebarButton:hover {
+  color: #FF66B2;
 }
 
 .pagination {
@@ -39,7 +46,8 @@ code {
 
 .active-page {
   color: #fff;
-  background-color: #0364ff;
+  background-color: #FF66B2;
   border-radius: 50%;
   padding: 1% 2.2%;
+  box-shadow: 0 2px 4px rgba(255, 102, 178, 0.2);
 }

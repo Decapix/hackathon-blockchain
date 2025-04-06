@@ -36,10 +36,10 @@ const Header = () => {
   }
 
   return (
-    <header className="sticky max-w-screen z-10">
-      <div className="px-4 py-4 mx-auto sm:py-2 sm:px-6 md:px-8 border-b">
+    <header className="sticky max-w-screen z-10 bg-white shadow-sm">
+      <div className="px-4 py-4 mx-auto sm:py-2 sm:px-6 md:px-8 border-b border-secondary">
         <div className="justify-between items-center flex">
-          <div className="flex justify-center py-3 flex-row" onClick={() => goToHome()}>
+          <div className="flex justify-center py-3 flex-row cursor-pointer transition-transform duration-200 hover:scale-105" onClick={() => goToHome()}>
             <div className="flex flex-row justify-center items-center">
               <img
                 src={web3authLogo}
@@ -48,7 +48,7 @@ const Header = () => {
                   paddingRight: "15px",
                 }}
               />
-              <div className="border-l-2 text-lg sm:text-xl text-gray-900 px-3 items-center">Ma Plateforme</div>
+              <div className="border-l-2 border-accent text-lg sm:text-xl text-primary font-medium px-3 items-center">Ma Plateforme</div>
             </div>
           </div>
           <div className="flex-col flex-row mt-0 items-center lg:flex hidden">
@@ -56,7 +56,7 @@ const Header = () => {
           </div>
           {isConnected && (
             <div className="flex-col flex-row mt-0 items-center flex lg:hidden">
-              <Hamburger toggled={isOpen} toggle={setOpen} size={25} direction="right" />
+              <Hamburger toggled={isOpen} toggle={setOpen} size={25} direction="right" color="#FF66B2" />
             </div>
           )}
         </div>
