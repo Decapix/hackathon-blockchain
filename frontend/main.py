@@ -228,7 +228,23 @@ else:
     API_URL = "http://backend:8000/update_exam"
     
     correct_answers = [q["correct_answer"] for q in QUESTIONS[exam]]
-    score = sum(1 for user_answer, correct_answer in zip(st.session_state.user_answers, correct_answers) if user_answer == correct_answer)
+    
+    # Convertir les réponses de l'utilisateur en lettres
+    converted_user_answers = []
+    for idx, user_answer in enumerate(st.session_state.user_answers):
+        q = QUESTIONS[exam][idx]
+        # Trouver l'index de la réponse de l'utilisateur dans les options
+        option_index = q["options"].index(user_answer)
+        # Convertir en lettre (0->A, 1->B, 2->C, 3->D)
+        letter_answer = chr(65 + option_index)  # 65 est le code ASCII de 'A'
+        converted_user_answers.append(letter_answer)
+
+    matches = []
+    for idx, (user_answer, correct_answer) in enumerate(zip(converted_user_answers, correct_answers)):
+        is_match = user_answer == correct_answer
+        matches.append(is_match)
+    
+    score = sum(matches)
     cheat_percentage = (len(st.session_state.cheated_questions) / total_questions)
     passed = score >= 0.6 and cheat_percentage < 0.2
 
