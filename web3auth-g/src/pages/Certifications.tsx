@@ -52,7 +52,7 @@ const Certifications: React.FC = () => {
             } else {
               console.error("No email provided");
               alert("An email is required to continue. You will be redirected to the menu.");
-              navigate("/menu");
+              navigate("/");
             }
           }
         }
@@ -73,7 +73,7 @@ const Certifications: React.FC = () => {
           } else {
             console.error("No email provided after error");
             alert("An email is required to continue. You will be redirected to the menu.");
-            navigate("/menu");
+            navigate("/");
           }
         }
       }
@@ -111,12 +111,12 @@ const Certifications: React.FC = () => {
           });
           
           console.log('Certification data received:', response.data);
-          // Trier les résultats par timestamp décroissant (plus récent en premier)
+          // Sort the results by timestamp in descending order (most recent first)
           const sortedData = [...response.data].sort((a, b) => {
-            // Convertir en nombre si c'est une chaîne
+            // Convert to number if it's a string
             const timestampA = typeof a.timestamp === 'string' ? parseInt(a.timestamp, 10) : a.timestamp;
             const timestampB = typeof b.timestamp === 'string' ? parseInt(b.timestamp, 10) : b.timestamp;
-            // Tri décroissant (du plus récent au plus ancien)
+            // Descending sort (most recent first)
             return timestampB - timestampA;
           });
           setCertifications(sortedData);
@@ -133,7 +133,7 @@ const Certifications: React.FC = () => {
   }, [userEmail]);
 
   const handleBackClick = (): void => {
-    navigate("/menu");
+    navigate("/");
   };
 
   // Format date string to include both date and time

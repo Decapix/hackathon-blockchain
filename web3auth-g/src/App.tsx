@@ -6,7 +6,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Contract from "./pages/Contract";
-import HomePage from "./pages/HomePage";
+// HomePage import removed as Menu is now the main page
 import AdminPage from "./pages/AdminPage";
 // import NFT from "./pages/NFT";
 import ServerSideVerification from "./pages/ServerSideVerification";
@@ -26,13 +26,13 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/">
-                  <Route index element={<HomePage />} />
+                  <Route index element={<Menu />} />
                   <Route path="admin" element={<AdminPage />} />
                   <Route path="contract" element={<Contract />} />
                   <Route path="transaction" element={<Transaction />} />
                   <Route path="server-side-verification" element={<ServerSideVerification />} />
                   <Route path="exam_list" element={<ExamList />} />
-                  <Route path="menu" element={<Menu />} />
+                  {/* Menu is now the index route */}
                   <Route path="certifications" element={<Certifications />} />
                 </Route>
               </Routes>
