@@ -49,7 +49,7 @@ const ExamList: React.FC = () => {
             } else {
               console.error("Aucun email fourni");
               alert("Un email est nécessaire pour continuer. Vous allez être redirigé vers le menu.");
-              navigate("/menu");
+              navigate("/");
             }
           }
         }
@@ -70,7 +70,7 @@ const ExamList: React.FC = () => {
           } else {
             console.error("Aucun email fourni après erreur");
             alert("Un email est nécessaire pour continuer. Vous allez être redirigé vers le menu.");
-            navigate("/menu");
+            navigate("/");
           }
         }
       }
@@ -93,7 +93,7 @@ const ExamList: React.FC = () => {
         const errorMsg = "User email not found. Please sign in again.";
         console.error(errorMsg);
         alert(errorMsg);
-        navigate("/menu"); // Redirect to menu to force re-authentication
+        navigate("/"); // Redirect to main page to force re-authentication
         return;
       }
 
@@ -151,7 +151,7 @@ const ExamList: React.FC = () => {
         
         // Redirection vers la page Menu après 1 seconde
         setTimeout(() => {
-          navigate("/menu");
+          navigate("/");
         }, 1000);
       } catch (axiosError) {
         throw axiosError; // Rethrow to be caught by the outer catch
@@ -185,7 +185,7 @@ const ExamList: React.FC = () => {
   };
 
   const handleBackClick = (): void => {
-    navigate("/menu");
+    navigate("/");
   };
 
   return (
