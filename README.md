@@ -48,6 +48,11 @@ git clone https://github.com/Decapix/hackathon-blockchain.git
 cd hackathon-blockchain
 ```
 
+2. Copy the .env-example (testing only):
+```bash
+cp .env-example .env
+```
+
 2. Start the services:
 ```bash
 ./run.sh restart-project
