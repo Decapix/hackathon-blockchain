@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import logo from './logo.svg';
 import './App.css';
 import CompanyForm from './company/CompanyForm';
+import StudentForm from './student/StudentForm';
 
 // Drag & drop Excel import component (reusable)
 function ExcelImport({ onFile, label }) {
@@ -217,6 +218,9 @@ function Home() {
       <Link to="/company" style={{ textDecoration: 'none' }}>
         <button className="main-btn">Company Area</button>
       </Link>
+      <Link to="/student" style={{ textDecoration: 'none' }}>
+        <button className="main-btn">Student Area</button>
+      </Link>
     </div>
   );
 }
@@ -230,6 +234,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/university" element={<UniversityForm />} />
             <Route path="/company" element={<CompanyForm />} />
+            <Route path="/student" element={<StudentForm />} />
           </Routes>
         </header>
       </div>
