@@ -1,3 +1,114 @@
+/* Thèmes */
+.theme-default {
+  --bg-main: #282c34;
+  --text-main: #fff;
+  --btn-gradient: linear-gradient(270deg, #1976d2, #1565c0, #42a5f5, #1565c0, #1976d2);
+  --btn-active: #1976d2;
+  --btn-border: #125ea2;
+  --input-border: #b0bec5;
+  --input-focus: #1976d2;
+}
+
+.theme-dark {
+  --bg-main: #181818;
+  --text-main: #e0e0e0;
+  --btn-gradient: linear-gradient(90deg, #232526, #414345, #232526);
+  --btn-active: #232526;
+  --btn-border: #414345;
+  --input-border: #333;
+  --input-focus: #61dafb;
+}
+
+.theme-pastel {
+  --bg-main: #f8fafc;
+  --text-main: #3a3a3a;
+  --btn-gradient: linear-gradient(90deg, #fcb6c9, #b6e0fc, #c9fcb6, #fcb6c9);
+  --btn-active: #b6e0fc;
+  --btn-border: #fcb6c9;
+  --input-border: #e0c3fc;
+  --input-focus: #b6e0fc;
+}
+
+.theme-forest {
+  --bg-main: #263d36;
+  --text-main: #e8f5e9;
+  --btn-gradient: linear-gradient(90deg, #388e3c, #43a047, #66bb6a, #388e3c);
+  --btn-active: #388e3c;
+  --btn-border: #1b5e20;
+  --input-border: #a5d6a7;
+  --input-focus: #43a047;
+}
+
+.theme-sunset {
+  --bg-main: #ffecd2;
+  --text-main: #6a1b1a;
+  --btn-gradient: linear-gradient(90deg, #ff9966, #ff5e62, #ff9966);
+  --btn-active: #ff5e62;
+  --btn-border: #d7263d;
+  --input-border: #ffd6c1;
+  --input-focus: #ff5e62;
+}
+
+.theme-ocean {
+  --bg-main: #e0f7fa;
+  --text-main: #01579b;
+  --btn-gradient: linear-gradient(90deg, #00bcd4, #2196f3, #00bcd4);
+  --btn-active: #2196f3;
+  --btn-border: #01579b;
+  --input-border: #b3e5fc;
+  --input-focus: #00bcd4;
+}
+
+.theme-cyberpunk {
+  --bg-main: #1a0033;
+  --text-main: #ff00cc;
+  --btn-gradient: linear-gradient(90deg, #ff00cc, #333399, #00fff7, #ff00cc);
+  --btn-active: #ff00cc;
+  --btn-border: #00fff7;
+  --input-border: #333399;
+  --input-focus: #ff00cc;
+}
+
+.theme-coffee {
+  --bg-main: #4b2e05;
+  --text-main: #f5e9da;
+  --btn-gradient: linear-gradient(90deg, #a47551, #6f4e37, #a47551);
+  --btn-active: #6f4e37;
+  --btn-border: #a47551;
+  --input-border: #d7ccc8;
+  --input-focus: #a47551;
+}
+
+.theme-ice {
+  --bg-main: #f0f8ff;
+  --text-main: #0d47a1;
+  --btn-gradient: linear-gradient(90deg, #b3e5fc, #e1f5fe, #b3e5fc);
+  --btn-active: #b3e5fc;
+  --btn-border: #81d4fa;
+  --input-border: #b3e5fc;
+  --input-focus: #0d47a1;
+}
+
+.theme-vintage {
+  --bg-main: #f5e6ca;
+  --text-main: #7c5e3c;
+  --btn-gradient: linear-gradient(90deg, #e0c097, #c2b280, #e0c097);
+  --btn-active: #c2b280;
+  --btn-border: #7c5e3c;
+  --input-border: #e0c097;
+  --input-focus: #c2b280;
+}
+
+.theme-grape {
+  --bg-main: #f3e6ff;
+  --text-main: #6d1b7b;
+  --btn-gradient: linear-gradient(90deg, #ba68c8, #8e24aa, #ba68c8);
+  --btn-active: #8e24aa;
+  --btn-border: #6d1b7b;
+  --input-border: #e1bee7;
+  --input-focus: #ba68c8;
+}
+
 .App {
   text-align: center;
 }
@@ -14,14 +125,14 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--bg-main);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: var(--text-main);
 }
 
 .App-link {
@@ -38,30 +149,45 @@
 }
 
 .main-btn {
-  background: linear-gradient(90deg, #1976d2 0%, #21cbf3 100%);
+  background: var(--btn-gradient);
   color: #fff;
   border: none;
-  border-radius: 24px;
-  padding: 14px 36px;
-  font-size: 1.15rem;
-  font-weight: 700;
+  border-radius: 6px;
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-  margin-bottom: 8px;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
-  letter-spacing: 0.5px;
+  transition: box-shadow 0.3s, animation-duration 0.3s;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+  animation: main-btn-gradient-move 4s linear infinite;
 }
 
-.main-btn:hover {
-  background: linear-gradient(90deg, #125ea2 0%, #1976d2 100%);
-  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.25);
-  transform: translateY(-2px) scale(1.03);
+@keyframes main-btn-gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.main-btn:hover, .main-btn:focus {
+  /* Animation plus douce et ombre légère */
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.12);
+  animation-duration: 2s;
 }
 
 .main-btn.active {
-  background: #1976d2 !important;
+  background: var(--btn-active) !important;
+  color: var(--text-main) !important;
+  border: 2px solid var(--btn-border);
+}
+
+.main-btn.active, .main-btn.active:focus, .main-btn.active:visited {
   color: #fff !important;
-  border: 2px solid #125ea2;
 }
 
 /* Ajoute du padding/marge entre les champs de formulaire */
@@ -80,7 +206,7 @@
 input, select, textarea {
   padding: 10px 14px;
   border-radius: 8px;
-  border: 1px solid #b0bec5;
+  border: 1px solid var(--input-border);
   font-size: 1rem;
   margin-bottom: 0;
   outline: none;
@@ -88,5 +214,5 @@ input, select, textarea {
 }
 
 input:focus, select:focus, textarea:focus {
-  border: 1.5px solid #1976d2;
+  border: 1.5px solid var(--input-focus);
 }

@@ -82,8 +82,24 @@ function AddStudent() {
         </div>
         {/* Ajoutez d'autres champs ici dans des div similaires */}
         <div className="button-group" style={{ marginTop: 16 }}>
-          <button className="main-btn" type="button" onClick={handleAddStudent}>
-            Add
+          <button
+            className="main-btn"
+            type="button"
+            onClick={handleAddStudent}
+            style={{
+              flex: 1,
+              background: '#1976d2',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '12px 0',
+              fontSize: '1rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              marginRight: 8
+            }}
+          >
+            Adding
           </button>
           <button className="main-btn" type="button" onClick={handleImport}>
             Import

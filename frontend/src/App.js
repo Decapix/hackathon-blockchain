@@ -47,6 +47,19 @@ function ExcelImport({ onFile, label }) {
     setMessage("Batch import sent!");
   };
 
+  // Style du bouton import (identique à Add Student)
+  const importBtnStyle = {
+    background: "#0097a7",
+    color: "#fff",
+    border: "none",
+    borderRadius: 4,
+    padding: "10px 24px",
+    fontWeight: 600,
+    fontSize: 16,
+    cursor: "pointer",
+    marginTop: 10
+  };
+
   return (
     <div className="excel-import">
       <form
@@ -77,7 +90,7 @@ function ExcelImport({ onFile, label }) {
           onDragLeave={handleDrag}
           style={{ height: 60 }}
         />
-        <button type="submit" style={{ marginTop: 10 }}>Import</button>
+        <button type="submit" className="main-btn" style={importBtnStyle}>Import</button>
       </form>
       {message && <div style={{ color: '#1976d2' }}>{message}</div>}
     </div>
@@ -101,12 +114,47 @@ function AddStudentForm() {
     setMessage("Student added!");
   };
 
+  // Style du bouton add (identique à Import)
+  const addBtnStyle = {
+    background: "#0097a7",
+    color: "#fff",
+    border: "none",
+    borderRadius: 4,
+    padding: "10px 24px",
+    fontWeight: 600,
+    fontSize: 16,
+    cursor: "pointer"
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="form-fac" style={{ marginBottom: 16 }}>
-      <input name="lastName" placeholder="Last name" value={form.lastName} onChange={handleChange} required />
-      <input name="firstName" placeholder="First name" value={form.firstName} onChange={handleChange} required />
-      <input name="email" placeholder="Personal email" value={form.email} onChange={handleChange} required />
-      <button type="submit">Add</button>
+    <form onSubmit={handleSubmit} className="form-fac" style={{ marginBottom: 16, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 12 }}>
+        <input
+          name="lastName"
+          placeholder="Last name"
+          value={form.lastName}
+          onChange={handleChange}
+          required
+          style={{ marginRight: 12, padding: 8, flex: 1 }}
+        />
+        <input
+          name="firstName"
+          placeholder="First name"
+          value={form.firstName}
+          onChange={handleChange}
+          required
+          style={{ padding: 8, flex: 1 }}
+        />
+      </div>
+      <input
+        name="email"
+        placeholder="Personal email"
+        value={form.email}
+        onChange={handleChange}
+        required
+        style={{ marginBottom: 12, padding: 8 }}
+      />
+      <button type="submit" className="main-btn" style={addBtnStyle}>Add</button>
       {message && <div style={{ color: '#1976d2' }}>{message}</div>}
     </form>
   );
@@ -136,24 +184,36 @@ function AddDiplomaForm() {
     setMessage("Diploma added!");
   };
 
+  // Style du bouton add (identique à Add Student)
+  const addBtnStyle = {
+    background: "#0097a7",
+    color: "#fff",
+    border: "none",
+    borderRadius: 4,
+    padding: "10px 24px",
+    fontWeight: 600,
+    fontSize: 16,
+    cursor: "pointer"
+  };
+
   return (
     <form onSubmit={handleSubmit} className="form-fac" style={{ marginBottom: 16 }}>
-      <input name="email" placeholder="Student email" value={form.email} onChange={handleChange} required />
-      <input name="diplomaName" placeholder="Diploma name" value={form.diplomaName} onChange={handleChange} required />
-      <input name="level" placeholder="Diploma level" value={form.level} onChange={handleChange} required />
-      <input name="specialty" placeholder="Specialty/Major" value={form.specialty} onChange={handleChange} required />
-      <input name="graduationDate" type="date" placeholder="Graduation date" value={form.graduationDate} onChange={handleChange} required />
-      <select name="status" value={form.status} onChange={handleChange} required>
+      <input name="email" placeholder="Student email" value={form.email} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
+      <input name="diplomaName" placeholder="Diploma name" value={form.diplomaName} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
+      <input name="level" placeholder="Diploma level" value={form.level} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
+      <input name="specialty" placeholder="Specialty/Major" value={form.specialty} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
+      <input name="graduationDate" type="date" placeholder="Graduation date" value={form.graduationDate} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
+      <select name="status" value={form.status} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }}>
         <option value="">Status</option>
         <option value="in progress">In progress</option>
         <option value="obtained">Obtained</option>
         <option value="not obtained">Not obtained</option>
       </select>
-      <input name="honors" placeholder="Honors" value={form.honors} onChange={handleChange} />
-      <input name="ects" placeholder="ECTS credits" value={form.ects} onChange={handleChange} />
-      <textarea name="courses" placeholder="Courses list" value={form.courses} onChange={handleChange} />
-      <textarea name="grades" placeholder="Grades" value={form.grades} onChange={handleChange} />
-      <button type="submit">Add</button>
+      <input name="honors" placeholder="Honors" value={form.honors} onChange={handleChange} style={{ marginBottom: 12, padding: 8 }} />
+      <input name="ects" placeholder="ECTS credits" value={form.ects} onChange={handleChange} style={{ marginBottom: 12, padding: 8 }} />
+      <textarea name="courses" placeholder="Courses list" value={form.courses} onChange={handleChange} style={{ marginBottom: 12, padding: 8 }} />
+      <textarea name="grades" placeholder="Grades" value={form.grades} onChange={handleChange} style={{ marginBottom: 12, padding: 8 }} />
+      <button type="submit" className="main-btn" style={addBtnStyle}>Add</button>
       {message && <div style={{ color: '#1976d2' }}>{message}</div>}
     </form>
   );
@@ -163,20 +223,42 @@ function AddDiplomaForm() {
 function UniversityForm() {
   const [tab, setTab] = useState('student');
 
+  // Thème forcé à "theme-ocean"
+  const theme = "theme-ocean";
+
+  // Styles pour le bouton non sélectionné
+  const themeBtnInactive = {
+    "theme-ocean": {
+      background: "#e0f7fa",
+      color: "var(--btn-active)",
+      border: "2px solid #b3e5fc"
+    }
+  };
+
   return (
     <div className="university-area" style={{ maxWidth: 500, margin: '0 auto', padding: 24 }}>
       <h2>University Area</h2>
       <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
         <button
           className={`main-btn${tab === 'student' ? ' active' : ''}`}
-          style={{ flex: 1, background: tab === 'student' ? '#1976d2' : '#e3eafc', color: tab === 'student' ? '#fff' : '#1976d2' }}
+          style={{
+            flex: 1,
+            ...(tab !== 'student'
+              ? (themeBtnInactive[theme] || { background: '#e3eafc', color: '#1976d2', border: "none" })
+              : {})
+          }}
           onClick={() => setTab('student')}
         >
           Add Student
         </button>
         <button
           className={`main-btn${tab === 'diploma' ? ' active' : ''}`}
-          style={{ flex: 1, background: tab === 'diploma' ? '#1976d2' : '#e3eafc', color: tab === 'diploma' ? '#fff' : '#1976d2' }}
+          style={{
+            flex: 1,
+            ...(tab !== 'diploma'
+              ? (themeBtnInactive[theme] || { background: '#e3eafc', color: '#1976d2', border: "none" })
+              : {})
+          }}
           onClick={() => setTab('diploma')}
         >
           Add Diploma
@@ -226,19 +308,25 @@ function Home() {
 }
 
 function App() {
+  // Thème forcé à "theme-ocean"
+  const theme = "theme-ocean";
+
   return (
-    <Router>
-      <div className="App">
-        <header className="App-header">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/university" element={<UniversityForm />} />
-            <Route path="/company" element={<CompanyForm />} />
-            <Route path="/student" element={<StudentForm />} />
-          </Routes>
-        </header>
-      </div>
-    </Router>
+    <div className={theme}>
+      {/* Suppression des boutons de sélection de thème */}
+      <Router>
+        <div className="App">
+          <header className="App-header">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/university" element={<UniversityForm />} />
+              <Route path="/company" element={<CompanyForm />} />
+              <Route path="/student" element={<StudentForm />} />
+            </Routes>
+          </header>
+        </div>
+      </Router>
+    </div>
   );
 }
 
