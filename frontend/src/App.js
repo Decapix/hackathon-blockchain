@@ -210,7 +210,7 @@ function Home() {
       gap: 24,
       marginTop: 60
     }}>
-      <h1>Diplomas & Professional Experiences Platform</h1>
+      <h1>La Certif</h1>
       <Link to="/university" style={{ textDecoration: 'none' }}>
         <button className="main-btn">University Area</button>
       </Link>
