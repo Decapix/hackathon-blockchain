@@ -1,0 +1,198 @@
+.formCompany {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2rem 2.5rem;
+  max-width: 500px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formCompany h2 {
+  color: #111;
+}
+
+input, select, textarea {
+  padding: 0.7rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fafbfc;
+  transition: border 0.2s;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  border: 1.5px solid #28a745;
+  outline: none;
+}
+
+.submitBtn {
+  background: linear-gradient(90deg, #28a745 0%, #00c851 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.2s;
+}
+
+.submitBtn:hover {
+  background: linear-gradient(90deg, #218838 0%, #00b36b 100%);
+}
+
+/* Nouveaux styles pour le système par onglets et la vérification de diplôme */
+.companyArea {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.mainBtn {
+  background: #0097a7;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.mainBtn.active {
+  background: #00838f;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.mainBtn:disabled {
+  background: #b0bec5;
+  cursor: not-allowed;
+}
+
+.formExperience, .formVerification {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.successMessage {
+  color: #28a745;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 4px;
+  background-color: rgba(40, 167, 69, 0.1);
+  border: 1px solid rgba(40, 167, 69, 0.2);
+  text-align: center;
+}
+
+.verificationContainer {
+  margin-bottom: 24px;
+}
+
+.verificationResult {
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.verified {
+  background-color: rgba(40, 167, 69, 0.1);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.notVerified {
+  background-color: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.diplomaDetails h3, .notVerifiedMessage h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.notVerifiedMessage p {
+  margin: 8px 0;
+  color: #721c24;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.detailRow {
+  display: flex;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.detailLabel {
+  font-weight: 500;
+  color: #495057;
+  width: 100px;
+}
+
+.detailValue {
+  flex: 1;
+  color: #212529;
+}
+
+.verificationHelp {
+  margin-top: 16px;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.testHint {
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.testHint code {
+  background: #f8f9fa;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #0097a7;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tab buttons styles */
+.tabButtons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.active {
+  background: #00838f;
+  color: white;
+}
+
+.inactive {
+  background: #e0f7fa;
+  color: #006064;
+  border: 2px solid #b3e5fc;
+}

@@ -1,24 +1,46 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import logo from './logo.svg';
-import './App.css';
-import CompanyForm from './company/CompanyForm';
-import StudentForm from './student/StudentForm';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+import styles from './UniversityForm.module.css';
 
-// Drag & drop Excel import component (reusable)
-function ExcelImport({ onFile, label }) {
-  const [dragActive, setDragActive] = useState(false);
-  const [file, setFile] = useState(null);
-  const [message, setMessage] = useState('');
+// Interface pour le formulaire d'ajout d'étudiant
+interface StudentFormData {
+  lastName: string;
+  firstName: string;
+  email: string;
+}
 
-  const handleDrag = (e) => {
+// Interface pour le formulaire d'ajout de diplôme
+interface DiplomaFormData {
+  email: string;
+  diplomaName: string;
+  level: string;
+  specialty: string;
+  graduationDate: string;
+  status: string;
+  honors: string;
+  ects: string;
+  courses: string;
+  grades: string;
+}
+
+// Composant pour le drag & drop d'import Excel
+interface ExcelImportProps {
+  onFile?: (file: File) => void;
+  label: string;
+}
+
+const ExcelImport: React.FC<ExcelImportProps> = ({ onFile, label }) => {
+  const [dragActive, setDragActive] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [message, setMessage] = useState<string>('');
+
+  const handleDrag = (e: React.DragEvent<HTMLFormElement | HTMLDivElement>): void => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
     else if (e.type === "dragleave") setDragActive(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -29,7 +51,7 @@ function ExcelImport({ onFile, label }) {
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
       setMessage(`Selected file: ${e.target.files[0].name}`);
@@ -37,7 +59,7 @@ function ExcelImport({ onFile, label }) {
     }
   };
 
-  const handleUpload = (e) => {
+  const handleUpload = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (!file) {
       setMessage("Please select an Excel file.");
@@ -47,7 +69,7 @@ function ExcelImport({ onFile, label }) {
     setMessage("Batch import sent!");
   };
 
-  // Style du bouton import (identique à Add Student)
+  // Style du bouton import
   const importBtnStyle = {
     background: "#0097a7",
     color: "#fff",
@@ -61,7 +83,7 @@ function ExcelImport({ onFile, label }) {
   };
 
   return (
-    <div className="excel-import">
+    <div className={styles.excelImport}>
       <form
         onDragEnter={handleDrag}
         onSubmit={handleUpload}
@@ -90,31 +112,32 @@ function ExcelImport({ onFile, label }) {
           onDragLeave={handleDrag}
           style={{ height: 60 }}
         />
-        <button type="submit" className="main-btn" style={importBtnStyle}>Import</button>
+        <button type="submit" className={styles.mainBtn} style={importBtnStyle}>Import</button>
       </form>
       {message && <div style={{ color: '#1976d2' }}>{message}</div>}
     </div>
   );
-}
+};
 
-// Add Student manually
-function AddStudentForm() {
-  const [form, setForm] = useState({
+// Composant pour ajouter un étudiant manuellement
+const AddStudentForm: React.FC = () => {
+  const [form, setForm] = useState<StudentFormData>({
     lastName: '',
     firstName: '',
     email: '',
   });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<string>('');
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => 
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     // TODO: Send to backend
     setMessage("Student added!");
   };
 
-  // Style du bouton add (identique à Import)
+  // Style du bouton add
   const addBtnStyle = {
     background: "#0097a7",
     color: "#fff",
@@ -127,7 +150,7 @@ function AddStudentForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-fac" style={{ marginBottom: 16, display: 'flex', flexDirection: 'column' }}>
+    <form onSubmit={handleSubmit} className={styles.formFac} style={{ marginBottom: 16, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 12 }}>
         <input
           name="lastName"
@@ -154,15 +177,15 @@ function AddStudentForm() {
         required
         style={{ marginBottom: 12, padding: 8 }}
       />
-      <button type="submit" className="main-btn" style={addBtnStyle}>Add</button>
+      <button type="submit" className={styles.mainBtn} style={addBtnStyle}>Add</button>
       {message && <div style={{ color: '#1976d2' }}>{message}</div>}
     </form>
   );
-}
+};
 
-// Add Diploma manually
-function AddDiplomaForm() {
-  const [form, setForm] = useState({
+// Composant pour ajouter un diplôme manuellement
+const AddDiplomaForm: React.FC = () => {
+  const [form, setForm] = useState<DiplomaFormData>({
     email: '',
     diplomaName: '',
     level: '',
@@ -174,17 +197,18 @@ function AddDiplomaForm() {
     courses: '',
     grades: '',
   });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<string>('');
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => 
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     // TODO: Send to backend
     setMessage("Diploma added!");
   };
 
-  // Style du bouton add (identique à Add Student)
+  // Style du bouton add
   const addBtnStyle = {
     background: "#0097a7",
     color: "#fff",
@@ -197,31 +221,97 @@ function AddDiplomaForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-fac" style={{ marginBottom: 16 }}>
-      <input name="email" placeholder="Student email" value={form.email} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
-      <input name="diplomaName" placeholder="Diploma name" value={form.diplomaName} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
-      <input name="level" placeholder="Diploma level" value={form.level} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
-      <input name="specialty" placeholder="Specialty/Major" value={form.specialty} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
-      <input name="graduationDate" type="date" placeholder="Graduation date" value={form.graduationDate} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }} />
-      <select name="status" value={form.status} onChange={handleChange} required style={{ marginBottom: 12, padding: 8 }}>
+    <form onSubmit={handleSubmit} className={styles.formFac} style={{ marginBottom: 16 }}>
+      <input 
+        name="email" 
+        placeholder="Student email" 
+        value={form.email} 
+        onChange={handleChange} 
+        required 
+        style={{ marginBottom: 12, padding: 8 }} 
+      />
+      <input 
+        name="diplomaName" 
+        placeholder="Diploma name" 
+        value={form.diplomaName} 
+        onChange={handleChange} 
+        required 
+        style={{ marginBottom: 12, padding: 8 }} 
+      />
+      <input 
+        name="level" 
+        placeholder="Diploma level" 
+        value={form.level} 
+        onChange={handleChange} 
+        required 
+        style={{ marginBottom: 12, padding: 8 }} 
+      />
+      <input 
+        name="specialty" 
+        placeholder="Specialty/Major" 
+        value={form.specialty} 
+        onChange={handleChange} 
+        required 
+        style={{ marginBottom: 12, padding: 8 }} 
+      />
+      <input 
+        name="graduationDate" 
+        type="date" 
+        placeholder="Graduation date" 
+        value={form.graduationDate} 
+        onChange={handleChange} 
+        required 
+        style={{ marginBottom: 12, padding: 8 }} 
+      />
+      <select 
+        name="status" 
+        value={form.status} 
+        onChange={handleChange} 
+        required 
+        style={{ marginBottom: 12, padding: 8 }}
+      >
         <option value="">Status</option>
         <option value="in progress">In progress</option>
         <option value="obtained">Obtained</option>
         <option value="not obtained">Not obtained</option>
       </select>
-      <input name="honors" placeholder="Honors" value={form.honors} onChange={handleChange} style={{ marginBottom: 12, padding: 8 }} />
-      <input name="ects" placeholder="ECTS credits" value={form.ects} onChange={handleChange} style={{ marginBottom: 12, padding: 8 }} />
-      <textarea name="courses" placeholder="Courses list" value={form.courses} onChange={handleChange} style={{ marginBottom: 12, padding: 8 }} />
-      <textarea name="grades" placeholder="Grades" value={form.grades} onChange={handleChange} style={{ marginBottom: 12, padding: 8 }} />
-      <button type="submit" className="main-btn" style={addBtnStyle}>Add</button>
+      <input 
+        name="honors" 
+        placeholder="Honors" 
+        value={form.honors} 
+        onChange={handleChange} 
+        style={{ marginBottom: 12, padding: 8 }} 
+      />
+      <input 
+        name="ects" 
+        placeholder="ECTS credits" 
+        value={form.ects} 
+        onChange={handleChange} 
+        style={{ marginBottom: 12, padding: 8 }} 
+      />
+      <textarea 
+        name="courses" 
+        placeholder="Courses list" 
+        value={form.courses} 
+        onChange={handleChange} 
+        style={{ marginBottom: 12, padding: 8 }} 
+      />
+      <textarea 
+        name="grades" 
+        placeholder="Grades" 
+        value={form.grades} 
+        onChange={handleChange} 
+        style={{ marginBottom: 12, padding: 8 }} 
+      />
+      <button type="submit" className={styles.mainBtn} style={addBtnStyle}>Add</button>
       {message && <div style={{ color: '#1976d2' }}>{message}</div>}
     </form>
   );
-}
+};
 
-// University area with tabs
-function UniversityForm() {
-  const [tab, setTab] = useState('student');
+// Composant principal pour l'espace université
+function UniversityForm(): React.ReactElement {
+  const [tab, setTab] = useState<'student' | 'diploma'>('student');
 
   // Thème forcé à "theme-ocean"
   const theme = "theme-ocean";
@@ -236,11 +326,11 @@ function UniversityForm() {
   };
 
   return (
-    <div className="university-area" style={{ maxWidth: 500, margin: '0 auto', padding: 24 }}>
+    <div className={styles.universityArea} style={{ maxWidth: 500, margin: '0 auto', padding: 24 }}>
       <h2>University Area</h2>
       <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
         <button
-          className={`main-btn${tab === 'student' ? ' active' : ''}`}
+          className={`${styles.mainBtn} ${tab === 'student' ? styles.active : ''}`}
           style={{
             flex: 1,
             ...(tab !== 'student'
@@ -252,7 +342,7 @@ function UniversityForm() {
           Add Student
         </button>
         <button
-          className={`main-btn${tab === 'diploma' ? ' active' : ''}`}
+          className={`${styles.mainBtn} ${tab === 'diploma' ? styles.active : ''}`}
           style={{
             flex: 1,
             ...(tab !== 'diploma'
@@ -284,50 +374,4 @@ function UniversityForm() {
   );
 }
 
-function Home() {
-  return (
-    <div className="home-buttons" style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 24,
-      marginTop: 60
-    }}>
-      <h1>La Certif</h1>
-      <Link to="/university" style={{ textDecoration: 'none' }}>
-        <button className="main-btn">University Area</button>
-      </Link>
-      <Link to="/company" style={{ textDecoration: 'none' }}>
-        <button className="main-btn">Company Area</button>
-      </Link>
-      <Link to="/student" style={{ textDecoration: 'none' }}>
-        <button className="main-btn">Student Area</button>
-      </Link>
-    </div>
-  );
-}
-
-function App() {
-  // Thème forcé à "theme-ocean"
-  const theme = "theme-ocean";
-
-  return (
-    <div className={theme}>
-      {/* Suppression des boutons de sélection de thème */}
-      <Router>
-        <div className="App">
-          <header className="App-header">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/university" element={<UniversityForm />} />
-              <Route path="/company" element={<CompanyForm />} />
-              <Route path="/student" element={<StudentForm />} />
-            </Routes>
-          </header>
-        </div>
-      </Router>
-    </div>
-  );
-}
-
-export default App;
+export default UniversityForm;

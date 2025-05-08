@@ -26,6 +26,7 @@ input, select, textarea {
   font-size: 1rem;
   background: #fafbfc;
   transition: border 0.2s;
+  width: 100%;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -48,4 +49,65 @@ input:focus, select:focus, textarea:focus {
 
 .submitBtn:hover {
   background: linear-gradient(90deg, #0056b3 0%, #00aaff 100%);
+}
+
+/* Nouveaux styles pour le système par onglets */
+.universityArea {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.mainBtn {
+  background: #0097a7;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.mainBtn.active {
+  background: #00838f;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.formFac {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.excelImport {
+  margin-bottom: 24px;
+}
+
+/* Tab buttons styles */
+.tabButtons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.active {
+  background: #00838f;
+  color: white;
+}
+
+.inactive {
+  background: #e0f7fa;
+  color: #006064;
+  border: 2px solid #b3e5fc;
 }

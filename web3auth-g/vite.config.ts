@@ -3,7 +3,12 @@ import { defineConfig } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      // Inclure les fichiers JS comme contenant du JSX
+      include: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
+    }),
+  ],
   resolve: {
     alias: {
       crypto: "empty-module",
